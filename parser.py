@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/opt/pyenv/shims/python3
 
 # ****************************************************************************
 #
@@ -24,8 +24,8 @@ class Parser():
         self.output_file = "maze.txt"
         self.perfect = False
         self.seed = 0
-        self.algorithm = "DST"
-        self.display_mode = "MLX"
+        self.algorithm = "BFS"
+        self.display_mode = "ASCII"
 
     def read_file(self) -> None:
         errors: list[ConfigError] = []
@@ -55,11 +55,13 @@ class Parser():
                 self.widht = int(value)
             except ValueError as e:
                 raise ConfigError.invalid_int("WIDTH") from e
+
         elif key == "HEIGHT":
             try:
                 self.height = int(value)
             except ValueError as e:
                 raise ConfigError.invalid_int("HEIGHT") from e
+
         elif key == "ENTRY":
             try:
                 x_str, y_str = value.split(",")
@@ -68,6 +70,7 @@ class Parser():
                 self.entry = (x, y)
             except Exception as e:
                 raise ConfigError.invalid_coordinates("ENTRY") from e
+
         elif key == "EXIT":
             try:
                 x_str, y_str = value.split(",")
@@ -76,10 +79,12 @@ class Parser():
                 self.exit = (x, y)
             except Exception as e:
                 raise ConfigError.invalid_coordinates("EXIT") from e
+
         elif key == "OUTPUT_FILE":
             if not value:
                 raise ConfigError("OUTPUT_FILE", "cannot be empty")
             self.output_file = value
+
         elif key == "PERFECT":
             if value == "True":
                 self.perfect = True
@@ -87,9 +92,30 @@ class Parser():
                 self.perfect = False
             else:
                 raise ConfigError("PERFECT", "must be True or False")
+        # opcional!
+        elif key == "SEED":
+            try:
+                self.seed = int(value)
+            except ValueError as e:
+                raise ConfigError.invalid_int("SEED") from e
+        # opcional!
+        elif key == "ALGORITHM":
+            if not value:
+                pass
+            valid_algorithms = {"BFS", "A*"}
+            if value.upper() not in valid_algorithms:
+                pass
+        # opcional!
+        elif key == "DISPLAY_MODE":
+            if not value:
+                pass
+            valid_modes = {"ASCII", "MLX"}
+            if value.upper() not in valid_modes:
+                pass
+            self.display_mode = value.upper()
         else:
             raise ConfigError(key, "unknown parameter")
 
 
 if __name__ == "__main__":
-    Parser("test.txt").read_file()
+    Parser("config.txt").read_file()

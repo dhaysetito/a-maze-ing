@@ -30,5 +30,5 @@ class ConfigError(MazeError):
     def invalid_coordinates(field: str) -> "ConfigError":
         return ConfigError(
             field,
-            "must be in format (x,y) where x and y are integers"
+            "must be in format x,y where x and y are integers"
             )
