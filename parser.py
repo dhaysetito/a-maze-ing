@@ -1,11 +1,13 @@
-#!/opt/pyenv/shims/python3
-
 # ****************************************************************************
 #
 #    a_maze_ing.py
 #
 #    By: dhde-lim <dhde-lim@student.42.rio> and
 #        ganselmo <ganselmo@student.42.rio>
+#
+#    Description: Parses and validates the maze configuration file (KEY=VALUE),
+#                 ensuring correct types and required parameters before
+#                 execution.
 #
 #    Created: 2026/04/22
 #
@@ -14,10 +16,10 @@
 from exceptions import ConfigError
 
 
-class Parser():
+class Parser:
     def __init__(self, file_name: str = "config.txt"):
         self.file_name = file_name
-        self.widht = 0
+        self.width = 0
         self.height = 0
         self.entry = (0, 0)
         self.exit = (0, 0)
@@ -27,7 +29,9 @@ class Parser():
         self.algorithm = "BFS"
         self.display_mode = "ASCII"
 
-    def read_file(self) -> None:
+        self._read_file()
+
+    def _read_file(self) -> None:
         errors: list[ConfigError] = []
 
         with open(self.file_name, "r") as file:
@@ -36,31 +40,26 @@ class Parser():
                     pass
                 else:
                     try:
-                        self.parse_line(line.strip())
+                        self._parse_line(line.strip())
                     except ConfigError as e:
-                        print(f"Caught ConfigError: {e}")
                         errors.append(e)
             if errors:
-                return
+                raise ConfigError.aggregate(errors)
 
-    def after_substring(self, s: str, sub: str) -> str:
-        _, sep, tail = s.partition(sub)
-        return tail if sep else ""
-
-    def parse_line(self, line: str) -> None:
+    def _parse_line(self, line: str) -> None:
         key, _, value = line.partition("=")
 
-        if key == "WIDHT":
+        if key == "WIDTH":
             try:
-                self.widht = int(value)
+                self.width = int(value)
             except ValueError as e:
-                raise ConfigError.invalid_int("WIDTH") from e
+                raise ConfigError.invalid_int("[WIDTH]") from e
 
         elif key == "HEIGHT":
             try:
                 self.height = int(value)
             except ValueError as e:
-                raise ConfigError.invalid_int("HEIGHT") from e
+                raise ConfigError.invalid_int("[HEIGHT]") from e
 
         elif key == "ENTRY":
             try:
@@ -69,7 +68,7 @@ class Parser():
                 y = int(y_str.strip())
                 self.entry = (x, y)
             except Exception as e:
-                raise ConfigError.invalid_coordinates("ENTRY") from e
+                raise ConfigError.invalid_coordinates("[ENTRY]") from e
 
         elif key == "EXIT":
             try:
@@ -78,11 +77,11 @@ class Parser():
                 y = int(y_str.strip())
                 self.exit = (x, y)
             except Exception as e:
-                raise ConfigError.invalid_coordinates("EXIT") from e
+                raise ConfigError.invalid_coordinates("[EXIT]") from e
 
         elif key == "OUTPUT_FILE":
             if not value:
-                raise ConfigError("OUTPUT_FILE", "cannot be empty")
+                raise ConfigError("[OUTPUT_FILE]", "cannot be empty")
             self.output_file = value
 
         elif key == "PERFECT":
@@ -91,13 +90,13 @@ class Parser():
             elif value == "False":
                 self.perfect = False
             else:
-                raise ConfigError("PERFECT", "must be True or False")
+                raise ConfigError("[PERFECT]", "must be True or False")
         # opcional!
         elif key == "SEED":
             try:
                 self.seed = int(value)
             except ValueError as e:
-                raise ConfigError.invalid_int("SEED") from e
+                raise ConfigError.invalid_int("[SEED]") from e
         # opcional!
         elif key == "ALGORITHM":
             if not value:
@@ -114,8 +113,10 @@ class Parser():
                 pass
             self.display_mode = value.upper()
         else:
-            raise ConfigError(key, "unknown parameter")
+            raise ConfigError("[" + key + "]", "unknown parameter")
 
 
 if __name__ == "__main__":
-    Parser("config.txt").read_file()
+    config = Parser("config.txt")
+    print(config.width)
+    print(config.output_file)

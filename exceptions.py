@@ -1,8 +1,6 @@
-#!/usr/bin/env python3
-
 # ****************************************************************************
 #
-#    a_maze_ing.py
+#    exceptions.py
 #
 #    By: dhde-lim <dhde-lim@student.42.rio> and
 #        ganselmo <ganselmo@student.42.rio>
@@ -20,7 +18,7 @@ class ConfigError(MazeError):
     def __init__(
             self, field: str, message: str = "Unknown config error"
             ) -> None:
-        super().__init__(f"[{field}] {message}")
+        super().__init__(f"{field} {message}")
 
     @staticmethod
     def invalid_int(field: str) -> "ConfigError":
@@ -32,3 +30,8 @@ class ConfigError(MazeError):
             field,
             "must be in format x,y where x and y are integers"
             )
+
+    @staticmethod
+    def aggregate(errors: list["ConfigError"]) -> "ConfigError":
+        messages = "\n".join(str(e) for e in errors)
+        return ConfigError(f"\n{messages}", "")
