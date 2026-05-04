@@ -31,7 +31,7 @@ class MazeGenerator:
             for cell in row:
                 cell.visited = False
 
-    def open_entry_exit(self, entry: tuple[int, int], exit: tuple[int, int]):
+    def open_entry_exit(self, entry: tuple[int, int], exit: tuple[int, int]) -> None:
         ex, ey = entry
         tx, ty = exit
 
