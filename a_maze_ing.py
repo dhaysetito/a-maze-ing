@@ -38,7 +38,7 @@ if __name__ == "__main__":
         config = Parser("config.txt")
 
         maze = Maze(config.width, config.height)
-        gen = MazeGenerator(maze, config.seed)
+        gen = MazeGenerator(maze)
         gen.generate()
 
         save_maze(config, maze)
