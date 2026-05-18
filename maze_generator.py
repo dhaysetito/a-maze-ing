@@ -51,6 +51,7 @@ class MazeGenerator:
     def generate(self) -> None:
         stack: list[tuple[int, int]] = []
 
+		# Deveria sempre começar em 0,0?
         # start in (0,0)
         x, y = 0, 0
         self.maze.get_cell(x, y).visited = True
