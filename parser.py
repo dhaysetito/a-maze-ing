@@ -13,10 +13,12 @@
 #
 # ****************************************************************************
 
+#TODO adicionar docstrings
 from exceptions import ConfigError
 
 
 class Parser:
+    #TODO fazer validação para os atributos obritgatórios
     def __init__(self, file_name: str = "config.txt"):
         self.file_name = file_name
         self.width = 0
@@ -33,9 +35,10 @@ class Parser:
 
     def _read_file(self) -> None:
         errors: list[ConfigError] = []
-
+		#TODO open sem tratamento para arquivo inexistente
         with open(self.file_name, "r") as file:
             for line in file:
+                # TODO tratar indexError
                 if (line[0] == "#"):
                     pass
                 else:
@@ -62,6 +65,7 @@ class Parser:
                 raise ConfigError.invalid_int("[HEIGHT]") from e
 
         elif key == "ENTRY":
+        # TODO tratamento para as coordenadas que estiverem fora do labirinto
             try:
                 x_str, y_str = value.split(",")
                 x = int(x_str.strip())
@@ -71,6 +75,7 @@ class Parser:
                 raise ConfigError.invalid_coordinates("[ENTRY]") from e
 
         elif key == "EXIT":
+        # TODO tratamento para as coordenadas que estiverem fora do labirinto
             try:
                 x_str, y_str = value.split(",")
                 x = int(x_str.strip())
@@ -99,6 +104,7 @@ class Parser:
                 raise ConfigError.invalid_int("[SEED]") from e
         # opcional!
         elif key == "ALGORITHM":
+            #TODO tratar algoritmo inválido
             if not value:
                 pass
             valid_algorithms = {"BFS", "A*"}
@@ -106,6 +112,7 @@ class Parser:
                 pass
         # opcional!
         elif key == "DISPLAY_MODE":
+            #TODO tratar modos inválidos
             if not value:
                 pass
             valid_modes = {"ASCII", "MLX"}
