@@ -14,6 +14,7 @@ from maze_structure import Maze
 from parser import Parser
 from exceptions import MazeError, ConfigError
 from menu import MazeMenu
+from solver import MazeSolver
 
 if __name__ == "__main__":
     try:
@@ -22,17 +23,14 @@ if __name__ == "__main__":
         maze = Maze(config)
 
         gen = MazeGenerator(maze, config)
-
         gen.generate()
-        gen.save_maze(maze, config)
 
-        menu = MazeMenu(
-            maze,
-            gen,
-            config,
-        )
+        solver = MazeSolver(maze, config)
+        solver.solve()
+        solution = solver.path_to_directions()
+        gen.save_maze(maze, config, solution)
 
-        menu.run()
+        MazeMenu(maze, gen, config).run()
 
     except ConfigError as e:
         print(f"Config error: {e}")
@@ -42,6 +40,6 @@ if __name__ == "__main__":
 
     except Exception as e:
         print(f"Error found: {e}")
-        
-    except KeyboardInterrupt as e:
-        print(f"\nQue a força esteja sempre com você!")
+
+    except KeyboardInterrupt:
+        print("\nQue a força esteja sempre com você!")

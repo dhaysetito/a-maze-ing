@@ -11,83 +11,26 @@
 # ****************************************************************************
 
 from __future__ import annotations
-
 from collections import deque
 
 from maze_structure import Maze
+from parser import Parser
 
 
 class MazeSolver:
-
-    DIRECTION_OFFSETS: dict[
-        str,
-        tuple[int, int],
-    ] = {
-        "N": (0, -1),
-        "S": (0, 1),
-        "E": (1, 0),
-        "W": (-1, 0),
-    }
-
     def __init__(
         self,
         maze: Maze,
-        start: tuple[int, int],
-        end: tuple[int, int],
+        config: Parser,
     ) -> None:
-
         self.maze = maze
+        self.entry = config.entry
+        self.exit = config.exit
 
-        self.start = start
-
-        self.end = end
-
-    def _is_valid_position(
-        self,
-        x: int,
-        y: int,
-    ) -> bool:
-        """Check if position is inside maze."""
-
-        return (
-            0 <= x < self.maze.width
-            and 0 <= y < self.maze.height
-        )
-
-    def _get_neighbors(
-        self,
-        x: int,
-        y: int,
-    ) -> list[tuple[int, int]]:
-        """Return reachable neighbors."""
-
-        neighbors = []
-
-        cell = self.maze.grid[y][x]
-
-        for direction, (
-            dx,
-            dy,
-        ) in (
-            self.DIRECTION_OFFSETS.items()
-        ):
-
-            if not cell.has_wall(direction):
-
-                nx = x + dx
-
-                ny = y + dy
-
-                if self._is_valid_position(
-                    nx,
-                    ny,
-                ):
-
-                    neighbors.append(
-                        (nx, ny)
-                    )
-
-        return neighbors
+        self.path: (
+            list[tuple[int, int]]
+            | None
+        ) = None
 
     def _reconstruct_path(
         self,
@@ -99,11 +42,9 @@ class MazeSolver:
         """Reconstruct shortest path."""
 
         path = []
-
-        current = self.end
+        current = self.exit
 
         while current is not None:
-
             path.append(current)
 
             current = parents[current]
@@ -112,40 +53,67 @@ class MazeSolver:
 
         return path
 
+    def path_to_directions(
+        self,
+    ) -> str:
+        """Convert coordinate path to directions."""
+
+        if self.path is None:
+            return ""
+
+        directions = []
+
+        for i in range(len(self.path) - 1):
+
+            x1, y1 = self.path[i]
+            x2, y2 = self.path[i + 1]
+
+            if x2 == x1 + 1:
+                directions.append("E")
+
+            elif x2 == x1 - 1:
+                directions.append("W")
+
+            elif y2 == y1 + 1:
+                directions.append("S")
+
+            elif y2 == y1 - 1:
+                directions.append("N")
+
+        return "".join(directions)
+
     def solve(
         self,
     ) -> list[tuple[int, int]]:
         """Solve maze using BFS."""
 
-        queue = deque()
+        queue = deque([self.entry])
 
-        queue.append(self.start)
-
-        visited = set()
-
-        visited.add(self.start)
+        visited = {self.entry}
 
         parents: dict[
             tuple[int, int],
             tuple[int, int] | None,
         ] = {
-            self.start: None
+            self.entry: None
         }
 
         while queue:
-
             current = queue.popleft()
 
-            if current == self.end:
-
-                return self._reconstruct_path(
-                    parents
+            if current == self.exit:
+                self.path = (
+                    self._reconstruct_path(
+                        parents
+                    )
                 )
+
+                return self.path
 
             x, y = current
 
             neighbors = (
-                self._get_neighbors(
+                self.maze.reachable_neighbors(
                     x,
                     y,
                 )
@@ -154,11 +122,12 @@ class MazeSolver:
             for neighbor in neighbors:
 
                 if neighbor not in visited:
-
                     visited.add(neighbor)
 
                     parents[neighbor] = current
 
                     queue.append(neighbor)
 
-        return []
+        self.path = []
+
+        return self.path

@@ -23,7 +23,7 @@ class ConfigError(MazeError):
     @staticmethod
     def missing_file(field: str) -> "ConfigError":
         return ConfigError(field, "is missing")
-    
+
     @staticmethod
     def missing_field(field: str) -> "ConfigError":
         return ConfigError(field, "is missing")
@@ -31,13 +31,13 @@ class ConfigError(MazeError):
     @staticmethod
     def invalid_int(field: str) -> "ConfigError":
         return ConfigError(field, "must be an integer")
-    
+
     @staticmethod
     def invalid_bound(field: str) -> "ConfigError":
         return ConfigError(
             field,
-            f"out of bounds: expected greater than 0"
-		)
+            "out of bounds: expected greater than 0"
+        )
 
     @staticmethod
     def invalid_coordinates(field: str) -> "ConfigError":
@@ -45,9 +45,10 @@ class ConfigError(MazeError):
             field,
             "must be in format x,y where x and y are integers"
         )
-        
+
     @staticmethod
-    def invalid_bound_coordinates(field: str, width: int, height: int) -> "ConfigError":
+    def invalid_bound_coordinates(field: str, width: int, height: int
+                                  ) -> "ConfigError":
         return ConfigError(
             field,
             f"coordinates out of bounds: "

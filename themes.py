@@ -1,3 +1,17 @@
+# ****************************************************************************
+#
+#    themes.py
+#
+#    By: dhde-lim <dhde-lim@student.42.rio> and
+#        ganselmo <ganselmo@student.42.rio>
+#
+#    Description: Terminal color themes used for maze rendering,
+#                 including path, walls, entry, exit and background
+#                 customization.
+#    Created: 2026/05/19
+#
+# ****************************************************************************
+
 DEFAULT_THEME: dict[str, str] = {
     "path": "\x1b[38;5;110m",
     "entry": "\x1b[38;5;108m",
@@ -50,4 +64,13 @@ BROOK_THEME: dict[str, str] = {
     "wall": "\x1b[38;5;232m",
     "bg": "\x1b[48;5;17m",
     "reset": "\x1b[0m",
+}
+
+THEMES: dict[str, tuple[str, dict[str, str]]] = {
+    "1": ("Default", DEFAULT_THEME),
+    "2": ("Nord", NORD_THEME),
+    "3": ("Dracula", DRACULA_THEME),
+    "4": ("Luffy", LUFFY_THEME),
+    "5": ("Zoro", ZORO_THEME),
+    "6": ("Brook", BROOK_THEME),
 }

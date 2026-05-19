@@ -14,6 +14,7 @@
 
 from parser import Parser
 
+
 class Cell:
     def __init__(self) -> None:
         self.north = True
@@ -58,17 +59,31 @@ class Maze:
 
     def neighbors(self, x: int, y: int) -> list[tuple[int, int]]:
         directions = [
-            (x, y - 1),  # North
-            (x + 1, y),  # East
-            (x, y + 1),  # South
-            (x - 1, y),  # West
+            ("N", x, y - 1),
+            ("E", x + 1, y),
+            ("S", x, y + 1),
+            ("W", x - 1, y)
         ]
 
         return [
-            (nx, ny)
-            for nx, ny in directions
+            (direction, nx, ny)
+            for direction, nx, ny in directions
             if self.in_bounds(nx, ny)
         ]
+
+    def reachable_neighbors(self, x: int, y: int
+                            ) -> list[tuple[int, int]]:
+        neighbors = []
+
+        cell = self.get_cell(x, y)
+
+        for direction, nx, ny in self.neighbors(x, y):
+
+            if not cell.has_wall(direction):
+
+                neighbors.append((nx, ny))
+
+        return neighbors
 
     def remove_wall(
         self,
@@ -150,7 +165,7 @@ if __name__ == "__main__":
             neighbors = maze.neighbors(x, y)
 
             if neighbors:
-                nx, ny = random.choice(neighbors)
+                _, nx, ny = random.choice(neighbors)
 
                 maze.remove_wall(x, y, nx, ny)
 

@@ -13,13 +13,15 @@
 
 from __future__ import annotations
 
+import os
+
+import themes
+
 from maze_generator import MazeGenerator
 from maze_structure import Maze
 from parser import Parser
-from solver import MazeSolver
-import os
 from renderer import MazeRenderer
-import themes
+from solver import MazeSolver
 
 
 class MazeMenu:
@@ -30,7 +32,7 @@ class MazeMenu:
         "3": themes.DRACULA_THEME,
         "4": themes.LUFFY_THEME,
         "5": themes.ZORO_THEME,
-        "6": themes.BROOK_THEME
+        "6": themes.BROOK_THEME,
     }
 
     def __init__(
@@ -46,9 +48,10 @@ class MazeMenu:
 
         self.show_path = False
 
-        self.path: list[tuple[int, int]] | None = None
+        self.path: (list[tuple[int, int]] | None) = None
 
         self.current_theme = themes.DEFAULT_THEME
+        self.current_theme_name = "Default"
 
         self.renderer = MazeRenderer(
             self.maze,
@@ -56,6 +59,8 @@ class MazeMenu:
             self.path,
             self.current_theme,
         )
+
+        self.save = True
 
     def _clear_screen(self) -> None:
         """Clear terminal screen."""
@@ -84,9 +89,15 @@ class MazeMenu:
 
         print("========== A-Maze-ing ==========")
         print("[1] Regenerate maze")
-        print("[2] Toggle shortest path")
-        print("[3] Change theme")
-        print("[4] Save maze")
+        if not self.show_path:
+            print("[2] Toggle shortest path (Disabled)")
+        else:
+            print("[2] Toggle shortest path (Enabled)")
+        print(f"[3] Change theme ({self.current_theme_name})")
+        if self.save:
+            print(f"[4] Save maze (saved to `{self.config.output_file}`)")
+        else:
+            print("[4] Save maze (not saved)")
         print("[0] Exit")
         print("================================")
 
@@ -97,13 +108,15 @@ class MazeMenu:
 
         self.maze = Maze(self.config)
 
-        self.generator = MazeGenerator(
-            self.maze,self.config
-        )
+        self.generator = MazeGenerator(self.maze, self.config)
 
         self.generator.generate()
 
-        self.path = None
+        solver = MazeSolver(self.maze, self.config)
+
+        self.path = solver.solve()
+
+        self.save = False
 
     def _toggle_path(self) -> None:
         """Show or hide shortest path."""
@@ -111,129 +124,71 @@ class MazeMenu:
         self.show_path = not self.show_path
 
         if self.show_path:
-
-            solver = MazeSolver(
-                self.maze,
-                self.config.entry,
-                self.config.exit,
-            )
-
+            solver = MazeSolver(self.maze, self.config)
             self.path = solver.solve()
 
-            print()
-            print("Path visualization enabled.")
-            print()
-            self._pause()
-
         else:
-
             self.path = None
-
-            print()
-            print("Path visualization disabled.")
-            print()
-            self._pause()
 
     def _change_theme(self) -> None:
         """Change renderer theme."""
 
-        print()
-
-        print("Choose a theme:")
+        print("\nChoose a theme:")
         print("[1] Default")
         print("[2] Nord")
         print("[3] Dracula")
         print("[4] Luffy")
         print("[5] Zoro")
         print("[6] Brook")
-        
 
         print()
 
         choice = input("Theme: ").strip()
 
-        if choice in self.THEMES:
+        if choice in themes.THEMES:
+            name, theme = (themes.THEMES[choice])
 
-            self.current_theme = (
-                self.THEMES[choice]
-            )
-
-            print()
-            print("Theme updated.")
-            print()
-            self._pause()
-
-        else:
-
-            print()
-            print("Invalid theme.")
-            print()
-            self._pause()
+            self.current_theme = theme
+            self.current_theme_name = name
 
     def _save_maze(self) -> None:
         """Save maze to output file."""
 
         try:
+            solver = MazeSolver(self.maze, self.config)
+            solver.solve()
+            solution = solver.path_to_directions()
+            self.generator.save_maze(self.maze, self.config, solution)
 
-            MazeGenerator.save_maze(
-                self.maze,
-                self.config,
-            )
-
-            print()
-
-            print(
-                f"Maze saved to "
-                f"{self.config.output_file}"
-            )
-
-            print()
-
-            self._pause()
+            print(f"\nMaze saved to {self.config.output_file}\n")
+            self.save = True
 
         except Exception:
-
-            print()
-            print("Failed to save maze.")
-            print()
-
+            print("\nFailed to save maze.\n")
+            self.save = False
             self._pause()
 
-    def _handle_choice(
-        self,
-        choice: str,
-    ) -> bool:
+    def _handle_choice(self, choice: str) -> bool:
         """Handle user menu selection."""
 
         if choice == "1":
-
             self._regenerate()
 
         elif choice == "2":
-
             self._toggle_path()
 
         elif choice == "3":
-
             self._change_theme()
 
         elif choice == "4":
-
             self._save_maze()
 
         elif choice == "0":
-
-            print()
-            print("Exiting A-Maze-ing.")
-            print()
-
+            print("\nQue a força esteja sempre com você!\n")
             return False
 
         else:
-
-            print()
-            print("Invalid option.")
-            print()
+            print("\nSelect a valid menu option (0-4).\n")
             self._pause()
 
         return True
@@ -247,19 +202,11 @@ class MazeMenu:
         """Start interactive menu loop."""
 
         running = True
-
         while running:
 
             self._clear_screen()
-
             self._render()
-
             self._show_menu()
 
-            choice = input(
-                "Option: "
-            ).strip()
-
-            running = self._handle_choice(
-                choice
-            )
+            choice = input("Option: ").strip()
+            running = self._handle_choice(choice)

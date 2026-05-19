@@ -217,15 +217,10 @@ class MazeRenderer:
         """Render complete maze."""
 
         self._update_theme()
-
         self._create_canvas()
-
         self._draw_cells()
-
         self._draw_path()
-
         self._draw_entry_exit()
 
         for line in self.canvas:
-
             print("".join(line))

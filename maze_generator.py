@@ -14,6 +14,7 @@ from maze_structure import Maze
 from exceptions import MazeError
 from parser import Parser
 
+
 class MazeGenerator:
     def __init__(self, maze: Maze, config: Parser) -> None:
         self.maze = maze
@@ -21,7 +22,7 @@ class MazeGenerator:
 
     def _unvisited_neighbors(self, x: int, y: int) -> list[tuple[int, int]]:
         result: list[tuple[int, int]] = []
-        for n_x, n_y in self.maze.neighbors(x, y):
+        for _, n_x, n_y in self.maze.neighbors(x, y):
             if not self.maze.get_cell(n_x, n_y).visited:
                 result.append((n_x, n_y))
         return result
@@ -31,7 +32,8 @@ class MazeGenerator:
             for cell in row:
                 cell.visited = False
 
-    def open_entry_exit(self, entry: tuple[int, int], exit: tuple[int, int]) -> None:
+    def open_entry_exit(self, entry: tuple[int, int], exit: tuple[int, int]
+                        ) -> None:
         ex, ey = entry
         tx, ty = exit
 
@@ -77,9 +79,9 @@ class MazeGenerator:
                 break
 
         self._reset_visited()
-        
+
     @staticmethod
-    def save_maze(maze: Maze, config: Parser) -> None:
+    def save_maze(maze: Maze, config: Parser, solution: str) -> None:
         try:
             with open(config.output_file, "w") as file:
                 for row in maze.grid:
@@ -92,8 +94,9 @@ class MazeGenerator:
                 file.write("\n")
                 file.write(str(config.exit[0]) + "," + str(config.exit[1]))
                 file.write("\n")
+                file.write(solution + "\n")
 
-        except ValueError as e:
+        except OSError as e:
             raise MazeError("Can't create file.") from e
 
 

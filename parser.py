@@ -13,20 +13,20 @@
 #
 # ****************************************************************************
 
-#TODO adicionar docstrings
+# TODO adicionar docstrings
 from exceptions import ConfigError
 
 
 class Parser:
     def __init__(self, file_name: str = "config.txt"):
         self.file_name = file_name
-        self.width = None
-        self.height = None
-        self.entry = None
-        self.exit = None
-        self.output_file = None
-        self.perfect = None
-        self.seed = None
+        self.width: (int | None) = None
+        self.height: (int | None) = None
+        self.entry: (tuple[int, int] | None) = None
+        self.exit: (tuple[int, int] | None) = None
+        self.output_file: (str | None) = None
+        self.perfect: (bool | None) = None
+        self.seed: (int | None) = None
         self.algorithm = "BFS"
 
         self._read_file()
@@ -37,14 +37,14 @@ class Parser:
             with open(self.file_name, "r") as file:
                 for line in file:
                     line = line.strip()
-                    if not line or line.startswith == "#":
+                    if not line or line.startswith("#"):
                         continue
                     try:
                         self._parse_line(line)
                     except ConfigError as e:
                         errors.append(e)
 
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             raise ConfigError.missing_file(f"[FILE] `{self.file_name}`")
 
         try:
@@ -63,7 +63,7 @@ class Parser:
                 self.width = int(value)
             except ValueError as e:
                 raise ConfigError.invalid_int(f"[{key}]") from e
-            
+
             if self.width <= 0:
                 raise ConfigError.invalid_bound(f"[{key}]")
 
@@ -72,7 +72,7 @@ class Parser:
                 self.height = int(value)
             except ValueError as e:
                 raise ConfigError.invalid_int("[HEIGHT]") from e
-            
+
             if self.height <= 0:
                 raise ConfigError.invalid_bound("[HEIGHT]")
 
@@ -81,17 +81,17 @@ class Parser:
                 x_str, y_str = value.split(",")
                 x = int(x_str.strip())
                 y = int(y_str.strip())
-                
-                self.entry = (x, y)               
-                
+
+                self.entry = (x, y)
+
             except Exception as e:
                 raise ConfigError.invalid_coordinates(f"[{key}]") from e
-            
+
             if self.width is None or self.height is None:
                 raise ConfigError(
-					(f"[{key}]"),
-					"WIDTH and HEIGHT must be defined before ENTRY"
-    				)
+                    (f"[{key}]"),
+                    "WIDTH and HEIGHT must be defined before ENTRY"
+                    )
             if x < 0 or x >= self.width or y < 0 or y >= self.height:
                 raise ConfigError.invalid_bound_coordinates(
                     (f"[{key}]"), self.width, self.height
@@ -105,12 +105,12 @@ class Parser:
                 self.exit = (x, y)
             except Exception as e:
                 raise ConfigError.invalid_coordinates(f"[{key}]") from e
-            
+
             if self.width is None or self.height is None:
                 raise ConfigError(
-					(f"[{key}]"),
-					"WIDTH and HEIGHT must be defined before EXIT"
-    				)
+                    (f"[{key}]"),
+                    "WIDTH and HEIGHT must be defined before EXIT"
+                    )
             if x < 0 or x >= self.width or y < 0 or y >= self.height:
                 raise ConfigError.invalid_bound_coordinates(
                     (f"[{key}]"), self.width, self.height
@@ -128,15 +128,15 @@ class Parser:
                 self.perfect = False
             else:
                 raise ConfigError(f"[{key}]", "must be True or False")
-        # opcional!
+
         elif key == "SEED":
             try:
                 self.seed = int(value)
             except ValueError as e:
                 raise ConfigError.invalid_int(f"[{key}]") from e
-        # opcional!
+
         elif key == "ALGORITHM":
-            #TODO tratar algoritmo inválido
+            # TODO tratar algoritmo inválido
             if not value:
                 pass
             valid_algorithms = {"BFS", "A*"}
@@ -144,24 +144,23 @@ class Parser:
                 pass
         else:
             raise ConfigError("[" + key + "]", "unknown parameter")
-        
-    
+
     def _validate_required_fields(self) -> None:
         if self.width is None:
             raise ConfigError.missing_field("[WIDTH]")
-        
+
         if self.height is None:
             raise ConfigError.missing_field("[HEIGHT]")
-        
+
         if self.entry is None:
             raise ConfigError.missing_field("[ENTRY]")
-        
+
         if self.exit is None:
             raise ConfigError.missing_field("[EXIT]")
-        
+
         if self.output_file is None:
             raise ConfigError.missing_field("[OUTPUT_FILE]")
-        
+
         if self.perfect is None:
             raise ConfigError.missing_field("[PERFECT]")
 
