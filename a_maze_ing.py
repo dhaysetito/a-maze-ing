@@ -61,4 +61,4 @@ if __name__ == "__main__":
         print(f"Maze error: {e}")
 
     except Exception as e:
-        print(f"Unexpected error: {e}")
+        print(f"Error found: {e}")

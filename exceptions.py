@@ -21,15 +21,38 @@ class ConfigError(MazeError):
         super().__init__(f"{field} {message}")
 
     @staticmethod
+    def missing_file(field: str) -> "ConfigError":
+        return ConfigError(field, "is missing")
+    
+    @staticmethod
+    def missing_field(field: str) -> "ConfigError":
+        return ConfigError(field, "is missing")
+
+    @staticmethod
     def invalid_int(field: str) -> "ConfigError":
         return ConfigError(field, "must be an integer")
+    
+    @staticmethod
+    def invalid_bound(field: str) -> "ConfigError":
+        return ConfigError(
+            field,
+            f"out of bounds: expected greater than 0"
+		)
 
     @staticmethod
     def invalid_coordinates(field: str) -> "ConfigError":
         return ConfigError(
             field,
             "must be in format x,y where x and y are integers"
-            )
+        )
+        
+    @staticmethod
+    def invalid_bound_coordinates(field: str, width: int, height: int) -> "ConfigError":
+        return ConfigError(
+            field,
+            f"coordinates out of bounds: "
+            f"expected 0 <= x < {width} and 0 <= y < {height}"
+        )
 
     @staticmethod
     def aggregate(errors: list["ConfigError"]) -> "ConfigError":
