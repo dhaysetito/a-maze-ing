@@ -1,203 +1,115 @@
-# ****************************************************************************
-#
-#    renderer.py
-#
-#    By: dhde-lim <dhde-lim@student.42.rio> and
-#        ganselmo <ganselmo@student.42.rio>
-#
-#    Description: ASCII renderer for maze visualization.
-#                 Displays walls, entry, exit and optional solution path.
-#
-#    Created: 2026/05/18
-#
-# ****************************************************************************
+from __future__ import annotations
 
 from maze_structure import Maze
+from themes import *
+
+BLOCK = "██"
+
+DIRECTION_OFFSETS: dict[str, tuple[int, int]] = {
+    "N": (0, -1),
+    "S": (0, 1),
+    "E": (1, 0),
+    "W": (-1, 0),
+}
 
 
-class MazeRenderer:
-    """Render a maze structure using ASCII visualization."""
+def _paint(
+    canvas: list[list[str]],
+    x: int,
+    y: int,
+    color: str,
+    reset: str,
+) -> None:
+    """Paint a single block in the canvas."""
+    canvas[y][x] = f"{color}{BLOCK}{reset}"
 
-    WALL_HORIZONTAL = "███"
-    WALL_VERTICAL = "█"
-    EMPTY_SPACE = "   "
 
-    START_SYMBOL = " S "
-    EXIT_SYMBOL = " E "
-    PATH_SYMBOL = " . "
+def render_ascii_maze(
+    generator: MazeGenerator,
+    config: dict[str, tuple[int, int]],
+    path: list[tuple[int, int]] | None = None,
+    theme: dict[str, str] | None = None,
+) -> None:
+    """Render the maze as colored ASCII art."""
+    if theme is None:
+        theme = DEFAULT_THEME
 
-    def __init__(self, maze: Maze) -> None:
-        self.maze = maze
+    wall_color = theme["wall"]
+    bg_color = theme["bg"]
+    path_color = theme["path"]
+    entry_color = theme["entry"]
+    exit_color = theme["exit"]
+    reset = theme["reset"]
 
-    def render_ascii(
-        self,
-        entry: tuple[int, int] | None = None,
-        exit: tuple[int, int] | None = None,
-        path: list[tuple[int, int]] | None = None,
-        show_path: bool = True,
-    ) -> str:
-        """
-        Generate an ASCII representation of the maze.
+    real_width = (generator.width * 2) + 1
+    real_height = (generator.height * 2) + 1
 
-        Args:
-            entry: Entry coordinates.
-            exit: Exit coordinates.
-            path: Optional solution path.
-            show_path: Controls path visibility.
+    canvas: list[list[str]] = [
+        [
+            f"{wall_color}{BLOCK}{reset}"
+            for _ in range(real_width)
+        ]
+        for _ in range(real_height)
+    ]
 
-        Returns:
-            Full ASCII maze as a string.
-        """
+    for y in range(generator.height):
+        for x in range(generator.width):
+            cx = (x * 2) + 1
+            cy = (y * 2) + 1
 
-        rendered_lines: list[str] = []
+            _paint(canvas, cx, cy, bg_color, reset)
 
-        path_set = set(path) if path is not None else set()
+            cell = generator.grid[y][x]
 
-        rendered_lines.append(self._top_border())
+            for direction, (dx, dy) in DIRECTION_OFFSETS.items():
+                if not cell.has_wall(direction):
+                    _paint(
+                        canvas,
+                        cx + dx,
+                        cy + dy,
+                        bg_color,
+                        reset,
+                    )
 
-        for y in range(self.maze.height):
-            rendered_lines.append(
-                self._cell_line(
-                    y,
-                    entry,
-                    exit,
-                    path_set,
-                    show_path,
+    if path:
+        for i, (px, py) in enumerate(path):
+            vx = (px * 2) + 1
+            vy = (py * 2) + 1
+
+            _paint(canvas, vx, vy, path_color, reset)
+
+            if i < len(path) - 1:
+                nx, ny = path[i + 1]
+
+                connector_x = vx + (nx - px)
+                connector_y = vy + (ny - py)
+
+                _paint(
+                    canvas,
+                    connector_x,
+                    connector_y,
+                    path_color,
+                    reset,
                 )
-            )
 
-            rendered_lines.append(self._bottom_line(y))
+    entry_x, entry_y = config["ENTRY"]
+    exit_x, exit_y = config["EXIT"]
 
-        return "\n".join(rendered_lines)
-
-    def display_ascii(
-        self,
-        entry: tuple[int, int] | None = None,
-        exit: tuple[int, int] | None = None,
-        path: list[tuple[int, int]] | None = None,
-        show_path: bool = True,
-    ) -> None:
-        """Print the ASCII maze to the terminal."""
-
-        print(
-            self.render_ascii(
-                entry=entry,
-                exit=exit,
-                path=path,
-                show_path=show_path,
-            )
-        )
-
-    def _top_border(self) -> str:
-        """Render the top border of the maze."""
-
-        line = "█"
-
-        for _ in range(self.maze.width):
-            line += self.WALL_HORIZONTAL + "█"
-
-        return line
-
-    def _bottom_line(self, y: int) -> str:
-        """Render horizontal walls for a row."""
-
-        line = "█"
-
-        for x in range(self.maze.width):
-            cell = self.maze.get_cell(x, y)
-
-            if cell.south:
-                line += self.WALL_HORIZONTAL
-            else:
-                line += self.EMPTY_SPACE
-
-            line += "█"
-
-        return line
-
-    def _cell_line(
-        self,
-        y: int,
-        entry: tuple[int, int] | None,
-        exit: tuple[int, int] | None,
-        path: set[tuple[int, int]],
-        show_path: bool,
-    ) -> str:
-        """Render maze cells for a row."""
-
-        line = ""
-
-        for x in range(self.maze.width):
-            cell = self.maze.get_cell(x, y)
-
-            if cell.west:
-                line += self.WALL_VERTICAL
-            else:
-                line += " "
-
-            line += self._cell_content(
-                x,
-                y,
-                entry,
-                exit,
-                path,
-                show_path,
-            )
-
-        last_cell = self.maze.get_cell(self.maze.width - 1, y)
-
-        if last_cell.east:
-            line += self.WALL_VERTICAL
-        else:
-            line += " "
-
-        return line
-
-    def _cell_content(
-        self,
-        x: int,
-        y: int,
-        entry: tuple[int, int] | None,
-        exit: tuple[int, int] | None,
-        path: set[tuple[int, int]],
-        show_path: bool,
-    ) -> str:
-        """Return visual content for a cell."""
-
-        position = (x, y)
-
-        if entry is not None and position == entry:
-            return self.START_SYMBOL
-
-        if exit is not None and position == exit:
-            return self.EXIT_SYMBOL
-
-        if show_path and position in path:
-            return self.PATH_SYMBOL
-
-        return self.EMPTY_SPACE
-
-
-if __name__ == "__main__":
-    from maze_generator import MazeGenerator
-
-    maze = Maze(10, 10)
-
-    generator = MazeGenerator(maze)
-    generator.generate()
-
-    renderer = MazeRenderer(maze)
-
-    renderer.display_ascii(
-        entry=(0, 0),
-        exit=(9, 5),
-        path=[
-            (0, 0),
-            (1, 0),
-            (2, 0),
-            (2, 1),
-            (2, 2),
-            (3, 2),
-        ],
-        show_path=True,
+    _paint(
+        canvas,
+        (entry_x * 2) + 1,
+        (entry_y * 2) + 1,
+        entry_color,
+        reset,
     )
+
+    _paint(
+        canvas,
+        (exit_x * 2) + 1,
+        (exit_y * 2) + 1,
+        exit_color,
+        reset,
+    )
+
+    for line in canvas:
+        print("".join(line))

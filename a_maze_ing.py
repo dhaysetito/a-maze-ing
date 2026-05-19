@@ -13,6 +13,7 @@ from maze_generator import MazeGenerator
 from maze_structure import Maze
 from parser import Parser
 from exceptions import MazeError, ConfigError
+from renderer import render_ascii_maze
 
 
 def save_maze(config: Parser, maze: Maze) -> None:
@@ -21,7 +22,7 @@ def save_maze(config: Parser, maze: Maze) -> None:
             for row in maze.grid:
                 line = "".join(maze.cell_to_hex(c) for c in row)
                 file.write(line + "\n")
-                print("".join(maze.cell_to_hex(c) for c in row))
+                #print("".join(maze.cell_to_hex(c) for c in row))
 
             file.write("\n")
             file.write(str(config.entry[0]) + "," + str(config.entry[1]))
@@ -38,8 +39,18 @@ if __name__ == "__main__":
         config = Parser("config.txt")
 
         maze = Maze(config.width, config.height)
+
         gen = MazeGenerator(maze)
+
         gen.generate()
+
+        render_ascii_maze(
+            maze,
+            {
+                "ENTRY": config.entry,
+                "EXIT": config.exit,
+            }
+        )
 
         save_maze(config, maze)
 
