@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import os
+import time
 
 import themes
 
@@ -61,11 +62,11 @@ class MazeMenu:
             self.current_theme,
         )
 
+        self.path = MazeSolver(self.maze, self.config).solve()
         self.save = True
 
     def _clear_screen(self) -> None:
         """Clear terminal screen."""
-
         os.system("clear")
 
     def _render(self) -> None:
@@ -80,7 +81,6 @@ class MazeMenu:
             self.renderer.path = None
 
         self.renderer.theme = self.current_theme
-
         self.renderer.render()
 
     def _show_menu(self) -> None:
@@ -88,7 +88,7 @@ class MazeMenu:
 
         print()
 
-        print("========== A-Maze-ing ==========")
+        print("========== Menu ==========")
         print("[1] Regenerate maze")
         if not self.show_path:
             print("[2] Toggle shortest path (Disabled)")
@@ -99,10 +99,18 @@ class MazeMenu:
             print(f"[4] Save maze (saved to `{self.config.output_file}`)")
         else:
             print("[4] Save maze (not saved)")
+        print("[5] Animate solution")
         print("[0] Exit")
         print("================================")
 
         print()
+
+    def _show_title(self) -> None:
+        """Show maze title and pattern status."""
+        print(f"\n{'='*20} A-Maze-ing {'='*20}")
+
+        if not self.generator.has_42_pattern:
+            print("42 pattern was not generated.\n")
 
     def _regenerate(self) -> None:
         """Generate a new maze."""
@@ -116,15 +124,7 @@ class MazeMenu:
 
     def _toggle_path(self) -> None:
         """Show or hide shortest path."""
-
         self.show_path = not self.show_path
-
-        if self.show_path:
-            solver = MazeSolver(self.maze, self.config)
-            self.path = solver.solve()
-
-        else:
-            self.path = None
 
     def _change_theme(self) -> None:
         """Change renderer theme."""
@@ -149,7 +149,6 @@ class MazeMenu:
 
     def _save_maze(self) -> None:
         """Save maze to output file."""
-
         try:
             new_file = input(
                 f"Enter the name of the file to save"
@@ -183,12 +182,15 @@ class MazeMenu:
         elif choice == "4":
             self._save_maze()
 
+        elif choice == "5":
+            self._animate_solution()
+
         elif choice == "0":
             print("\nQue a força esteja sempre com você!\n")
             return False
 
         else:
-            print("\nSelect a valid menu option (0-4).\n")
+            print("\nSelect a valid menu option (0-5).\n")
             self._pause()
 
         return True
@@ -198,12 +200,33 @@ class MazeMenu:
 
         input("Press ENTER to continue...")
 
+    def _animate_solution(self) -> None:
+        """Animate maze solution."""
+
+        solver = MazeSolver(self.maze, self.config)
+        path = solver.solve()
+
+        if not path:
+            return
+
+        for i in range(len(path) + 1):
+            self.renderer.path = path[:i]
+            print("\033[H", end="")
+            self._show_title()
+            self.renderer.render()
+
+            time.sleep(0.01)
+
+        self.path = path
+        self.show_path = True
+
     def run(self) -> None:
         """Start interactive menu loop."""
 
         running = True
         while running:
             self._clear_screen()
+            self._show_title()
             self._render()
             self._show_menu()
 

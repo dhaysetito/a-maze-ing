@@ -104,7 +104,6 @@ class MazeRenderer:
                 cell = self.maze.grid[y][x]
 
                 if cell.blocked:
-
                     self._paint(
                         cx,
                         cy,
@@ -113,7 +112,6 @@ class MazeRenderer:
                     )
 
                 else:
-
                     self._paint(
                         cx,
                         cy,
@@ -124,17 +122,13 @@ class MazeRenderer:
                 for direction, (dx, dy) in (
                     self.DIRECTION_OFFSETS.items()
                 ):
-
                     if not cell.has_wall(direction):
-
                         nx = cx + dx
                         ny = cy + dy
-
                         if (
-                            0 <= nx < self.real_width
-                            and 0 <= ny < self.real_height
+                            0 <= nx < self.real_width and
+                            0 <= ny < self.real_height
                         ):
-
                             self._paint(
                                 nx,
                                 ny,

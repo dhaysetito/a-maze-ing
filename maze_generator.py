@@ -20,7 +20,7 @@ class MazeGenerator:
         self.maze = maze
         self.config = config
         self.random = random.Random(config.seed)
-        self.blocked = False
+        self.has_42_pattern = False
 
     def _unvisited_neighbors(self, x: int, y: int) -> list[tuple[int, int]]:
         result: list[tuple[int, int]] = []
@@ -37,7 +37,13 @@ class MazeGenerator:
             for cell in row:
                 cell.visited = False
 
-    def _open_entry_exit(self) -> None:
+    def _clear_42_pattern(self) -> None:
+        """Remove 42 blocked cells."""
+        for row in self.maze.grid:
+            for cell in row:
+                cell.blocked = False
+
+    def _validate_entry_exit(self) -> None:
         # TODO: modificar logica se quiser funcionar para qualquer
         # entrada e saida
         assert self.config.entry is not None
@@ -49,10 +55,10 @@ class MazeGenerator:
             raise MazeError("Entry and exit must be different")
 
         if self.maze.get_cell(entry[0], entry[1]).blocked:
-            raise MazeError("Entry canot be inside the 42 pattern")
+            raise MazeError("Entry cannot be inside the 42 pattern")
 
         if self.maze.get_cell(exit[0], exit[1]).blocked:
-            raise MazeError("Exit canot be inside the 42 pattern")
+            raise MazeError("Exit cannot be inside the 42 pattern")
 
         self.entry = entry
         self.exit = exit
@@ -61,8 +67,13 @@ class MazeGenerator:
     def generate(self) -> None:
         stack: list[tuple[int, int]] = []
 
-        self._create_42_pattern()
-        self._open_entry_exit()
+        try:
+            self._create_42_pattern()
+            self._validate_entry_exit()
+        except MazeError:
+            self._clear_42_pattern()
+            self.has_42_pattern = False
+
         x, y = 0, 0
         self.maze.get_cell(x, y).visited = True
 
@@ -129,6 +140,7 @@ class MazeGenerator:
             ):
                 cell = self.maze.get_cell(x, y)
                 cell.blocked = True
+        self.has_42_pattern = True
 
     @staticmethod
     def save_maze(maze: Maze, config: Parser, solution: str) -> None:
