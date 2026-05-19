@@ -1,115 +1,231 @@
 from __future__ import annotations
 
 from maze_structure import Maze
-from themes import *
-
-BLOCK = "██"
-
-DIRECTION_OFFSETS: dict[str, tuple[int, int]] = {
-    "N": (0, -1),
-    "S": (0, 1),
-    "E": (1, 0),
-    "W": (-1, 0),
-}
+from parser import Parser
+from themes import DEFAULT_THEME
 
 
-def _paint(
-    canvas: list[list[str]],
-    x: int,
-    y: int,
-    color: str,
-    reset: str,
-) -> None:
-    """Paint a single block in the canvas."""
-    canvas[y][x] = f"{color}{BLOCK}{reset}"
+class MazeRenderer:
 
+    BLOCK = "██"
 
-def render_ascii_maze(
-    generator: MazeGenerator,
-    config: dict[str, tuple[int, int]],
-    path: list[tuple[int, int]] | None = None,
-    theme: dict[str, str] | None = None,
-) -> None:
-    """Render the maze as colored ASCII art."""
-    if theme is None:
-        theme = DEFAULT_THEME
+    DIRECTION_OFFSETS: dict[str, tuple[int, int]] = {
+        "N": (0, -1),
+        "S": (0, 1),
+        "E": (1, 0),
+        "W": (-1, 0),
+    }
 
-    wall_color = theme["wall"]
-    bg_color = theme["bg"]
-    path_color = theme["path"]
-    entry_color = theme["entry"]
-    exit_color = theme["exit"]
-    reset = theme["reset"]
+    def __init__(
+        self,
+        maze: Maze,
+        config: Parser,
+        path: list[tuple[int, int]] | None = None,
+        theme: dict[str, str] | None = None,
+    ) -> None:
 
-    real_width = (generator.width * 2) + 1
-    real_height = (generator.height * 2) + 1
+        self.maze = maze
+        self.config = config
+        self.path = path
 
-    canvas: list[list[str]] = [
-        [
-            f"{wall_color}{BLOCK}{reset}"
-            for _ in range(real_width)
+        if theme is None:
+            self.theme = DEFAULT_THEME
+
+        else:
+            self.theme = theme
+
+        self.real_width = (
+            self.maze.width * 2
+        ) + 1
+
+        self.real_height = (
+            self.maze.height * 2
+        ) + 1
+
+        self._update_theme()
+
+        self.canvas: list[list[str]] = []
+
+    def _update_theme(self) -> None:
+        """Update renderer theme colors."""
+
+        self.wall_color = self.theme["wall"]
+
+        self.bg_color = self.theme["bg"]
+
+        self.path_color = self.theme["path"]
+
+        self.entry_color = self.theme["entry"]
+
+        self.exit_color = self.theme["exit"]
+
+        self.reset = self.theme["reset"]
+
+    def _create_canvas(self) -> None:
+        """Create a fresh render canvas."""
+
+        self.canvas = [
+            [
+                (
+                    f"{self.wall_color}"
+                    f"{self.BLOCK}"
+                    f"{self.reset}"
+                )
+                for _ in range(
+                    self.real_width
+                )
+            ]
+            for _ in range(
+                self.real_height
+            )
         ]
-        for _ in range(real_height)
-    ]
 
-    for y in range(generator.height):
-        for x in range(generator.width):
-            cx = (x * 2) + 1
-            cy = (y * 2) + 1
+    def _paint(
+        self,
+        x: int,
+        y: int,
+        color: str,
+    ) -> None:
+        """Paint a single block."""
 
-            _paint(canvas, cx, cy, bg_color, reset)
+        self.canvas[y][x] = (
+            f"{color}"
+            f"{self.BLOCK}"
+            f"{self.reset}"
+        )
 
-            cell = generator.grid[y][x]
+    def _draw_cells(self) -> None:
+        """Draw maze cells."""
 
-            for direction, (dx, dy) in DIRECTION_OFFSETS.items():
-                if not cell.has_wall(direction):
-                    _paint(
-                        canvas,
-                        cx + dx,
-                        cy + dy,
-                        bg_color,
-                        reset,
-                    )
+        for y in range(self.maze.height):
 
-    if path:
-        for i, (px, py) in enumerate(path):
-            vx = (px * 2) + 1
-            vy = (py * 2) + 1
+            for x in range(self.maze.width):
 
-            _paint(canvas, vx, vy, path_color, reset)
+                cx = (x * 2) + 1
 
-            if i < len(path) - 1:
-                nx, ny = path[i + 1]
+                cy = (y * 2) + 1
 
-                connector_x = vx + (nx - px)
-                connector_y = vy + (ny - py)
-
-                _paint(
-                    canvas,
-                    connector_x,
-                    connector_y,
-                    path_color,
-                    reset,
+                self._paint(
+                    cx,
+                    cy,
+                    self.bg_color,
                 )
 
-    entry_x, entry_y = config["ENTRY"]
-    exit_x, exit_y = config["EXIT"]
+                cell = self.maze.grid[y][x]
 
-    _paint(
-        canvas,
-        (entry_x * 2) + 1,
-        (entry_y * 2) + 1,
-        entry_color,
-        reset,
-    )
+                for direction, (
+                    dx,
+                    dy,
+                ) in (
+                    self.DIRECTION_OFFSETS.items()
+                ):
 
-    _paint(
-        canvas,
-        (exit_x * 2) + 1,
-        (exit_y * 2) + 1,
-        exit_color,
-        reset,
-    )
+                    if not cell.has_wall(
+                        direction
+                    ):
 
-    for line in canvas:
-        print("".join(line))
+                        nx = cx + dx
+
+                        ny = cy + dy
+
+                        if (
+                            0 <= nx
+                            < self.real_width
+                            and 0 <= ny
+                            < self.real_height
+                        ):
+
+                            self._paint(
+                                nx,
+                                ny,
+                                self.bg_color,
+                            )
+
+    def _draw_path(self) -> None:
+        """Draw solution path."""
+
+        if not self.path:
+
+            return
+
+        for i, (
+            px,
+            py,
+        ) in enumerate(self.path):
+
+            vx = (px * 2) + 1
+
+            vy = (py * 2) + 1
+
+            self._paint(
+                vx,
+                vy,
+                self.path_color,
+            )
+
+            if i < len(self.path) - 1:
+
+                nx, ny = (
+                    self.path[i + 1]
+                )
+
+                connector_x = (
+                    vx + (nx - px)
+                )
+
+                connector_y = (
+                    vy + (ny - py)
+                )
+
+                if (
+                    0 <= connector_x
+                    < self.real_width
+                    and 0 <= connector_y
+                    < self.real_height
+                ):
+
+                    self._paint(
+                        connector_x,
+                        connector_y,
+                        self.path_color,
+                    )
+
+    def _draw_entry_exit(self) -> None:
+        """Draw entry and exit."""
+
+        entry_x, entry_y = (
+            self.config.entry
+        )
+
+        exit_x, exit_y = (
+            self.config.exit
+        )
+
+        self._paint(
+            (entry_x * 2) + 1,
+            (entry_y * 2) + 1,
+            self.entry_color,
+        )
+
+        self._paint(
+            (exit_x * 2) + 1,
+            (exit_y * 2) + 1,
+            self.exit_color,
+        )
+
+    def render(self) -> None:
+        """Render complete maze."""
+
+        self._update_theme()
+
+        self._create_canvas()
+
+        self._draw_cells()
+
+        self._draw_path()
+
+        self._draw_entry_exit()
+
+        for line in self.canvas:
+
+            print("".join(line))

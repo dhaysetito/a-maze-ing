@@ -13,8 +13,8 @@ from maze_generator import MazeGenerator
 from maze_structure import Maze
 from parser import Parser
 from exceptions import MazeError, ConfigError
-from renderer import render_ascii_maze
-
+from renderer import MazeRenderer
+from menu import MazeMenu
 
 if __name__ == "__main__":
     try:
@@ -27,14 +27,17 @@ if __name__ == "__main__":
         gen.generate()
         gen.save_maze(maze, config)
   
-        render_ascii_maze(
+        #mazerender = MazeRenderer(maze, config)
+        
+        #mazerender.render()
+
+        menu = MazeMenu(
             maze,
-            {
-                "ENTRY": config.entry,
-                "EXIT": config.exit,
-            }
+            gen,
+            config,
         )
 
+        menu.run()
 
     except ConfigError as e:
         print(f"Config error: {e}")
@@ -44,3 +47,6 @@ if __name__ == "__main__":
 
     except Exception as e:
         print(f"Error found: {e}")
+        
+    except KeyboardInterrupt as e:
+        print(f"\nQue a força esteja sempre com você!")
