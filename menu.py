@@ -16,6 +16,7 @@ from __future__ import annotations
 from maze_generator import MazeGenerator
 from maze_structure import Maze
 from parser import Parser
+from solver import MazeSolver
 import os
 from renderer import MazeRenderer
 import themes
@@ -111,15 +112,27 @@ class MazeMenu:
 
         if self.show_path:
 
+            solver = MazeSolver(
+                self.maze,
+                self.config.entry,
+                self.config.exit,
+            )
+
+            self.path = solver.solve()
+
             print()
             print("Path visualization enabled.")
             print()
+            self._pause()
 
         else:
+
+            self.path = None
 
             print()
             print("Path visualization disabled.")
             print()
+            self._pause()
 
     def _change_theme(self) -> None:
         """Change renderer theme."""
@@ -148,44 +161,24 @@ class MazeMenu:
             print()
             print("Theme updated.")
             print()
+            self._pause()
 
         else:
 
             print()
             print("Invalid theme.")
             print()
+            self._pause()
 
     def _save_maze(self) -> None:
         """Save maze to output file."""
 
         try:
 
-            with open(
-                self.config.output_file,
-                "w",
-                encoding="utf-8",
-            ) as file:
-
-                for row in self.maze.grid:
-
-                    line = "".join(
-                        self.maze.cell_to_hex(cell)
-                        for cell in row
-                    )
-
-                    file.write(line + "\n")
-
-                file.write("\n")
-
-                file.write(
-                    f"{self.config.entry[0]},"
-                    f"{self.config.entry[1]}\n"
-                )
-
-                file.write(
-                    f"{self.config.exit[0]},"
-                    f"{self.config.exit[1]}\n"
-                )
+            MazeGenerator.save_maze(
+                self.maze,
+                self.config,
+            )
 
             print()
 
@@ -196,11 +189,15 @@ class MazeMenu:
 
             print()
 
-        except OSError:
+            self._pause()
+
+        except Exception:
 
             print()
             print("Failed to save maze.")
             print()
+
+            self._pause()
 
     def _handle_choice(
         self,
@@ -237,8 +234,14 @@ class MazeMenu:
             print()
             print("Invalid option.")
             print()
+            self._pause()
 
         return True
+
+    def _pause(self) -> None:
+        """Wait for user before continuing."""
+
+        input("Press ENTER to continue...")
 
     def run(self) -> None:
         """Start interactive menu loop."""

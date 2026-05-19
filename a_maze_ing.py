@@ -13,7 +13,6 @@ from maze_generator import MazeGenerator
 from maze_structure import Maze
 from parser import Parser
 from exceptions import MazeError, ConfigError
-from renderer import MazeRenderer
 from menu import MazeMenu
 
 if __name__ == "__main__":
@@ -26,10 +25,6 @@ if __name__ == "__main__":
 
         gen.generate()
         gen.save_maze(maze, config)
-  
-        #mazerender = MazeRenderer(maze, config)
-        
-        #mazerender.render()
 
         menu = MazeMenu(
             maze,

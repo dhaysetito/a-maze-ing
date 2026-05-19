@@ -1,13 +1,3 @@
-NORD_THEME: dict[str, str] = {
-    "path": "\033[33m",
-    "entry": "\033[32m",
-    "exit": "\033[31m",
-    "wall": "\033[37m",
-    "bg": "\033[30m",
-    "reset": "\033[0m",
-}
-
-
 DEFAULT_THEME: dict[str, str] = {
     "path": "\x1b[38;5;110m",
     "entry": "\x1b[38;5;108m",
@@ -17,6 +7,14 @@ DEFAULT_THEME: dict[str, str] = {
     "reset": "\x1b[0m",
 }
 
+NORD_THEME: dict[str, str] = {
+    "path": "\033[33m",
+    "entry": "\033[32m",
+    "exit": "\033[31m",
+    "wall": "\033[38;5;130m",
+    "bg": "\033[30m",
+    "reset": "\033[0m",
+}
 
 DRACULA_THEME: dict[str, str] = {
     "path": "\x1b[38;5;212m",
