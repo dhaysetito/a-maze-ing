@@ -34,13 +34,8 @@ class MazeRenderer:
         else:
             self.theme = theme
 
-        self.real_width = (
-            self.maze.width * 2
-        ) + 1
-
-        self.real_height = (
-            self.maze.height * 2
-        ) + 1
+        self.real_width = (self.maze.width * 2) + 1
+        self.real_height = (self.maze.height * 2) + 1
 
         self._update_theme()
 
@@ -50,15 +45,10 @@ class MazeRenderer:
         """Update renderer theme colors."""
 
         self.wall_color = self.theme["wall"]
-
         self.bg_color = self.theme["bg"]
-
         self.path_color = self.theme["path"]
-
         self.entry_color = self.theme["entry"]
-
         self.exit_color = self.theme["exit"]
-
         self.reset = self.theme["reset"]
 
     def _create_canvas(self) -> None:
@@ -145,61 +135,33 @@ class MazeRenderer:
         """Draw solution path."""
 
         if not self.path:
-
             return
 
-        for i, (
-            px,
-            py,
-        ) in enumerate(self.path):
-
+        for i, (px, py) in enumerate(self.path):
             vx = (px * 2) + 1
-
             vy = (py * 2) + 1
 
-            self._paint(
-                vx,
-                vy,
-                self.path_color,
-            )
+            self._paint(vx, vy, self.path_color)
 
             if i < len(self.path) - 1:
+                nx, ny = self.path[i + 1]
 
-                nx, ny = (
-                    self.path[i + 1]
-                )
-
-                connector_x = (
-                    vx + (nx - px)
-                )
-
-                connector_y = (
-                    vy + (ny - py)
-                )
+                connector_x = vx + (nx - px)
+                connector_y = vy + (ny - py)
 
                 if (
-                    0 <= connector_x
-                    < self.real_width
-                    and 0 <= connector_y
-                    < self.real_height
+                    0 <= connector_x < self.real_width
+                    and 0 <= connector_y < self.real_height
                 ):
-
-                    self._paint(
-                        connector_x,
-                        connector_y,
-                        self.path_color,
-                    )
+                    self._paint(connector_x, connector_y, self.path_color)
 
     def _draw_entry_exit(self) -> None:
         """Draw entry and exit."""
 
-        entry_x, entry_y = (
-            self.config.entry
-        )
-
-        exit_x, exit_y = (
-            self.config.exit
-        )
+        assert self.config.entry is not None
+        assert self.config.exit is not None
+        entry_x, entry_y = self.config.entry
+        exit_x, exit_y = self.config.exit
 
         self._paint(
             (entry_x * 2) + 1,

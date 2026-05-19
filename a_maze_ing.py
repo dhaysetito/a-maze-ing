@@ -17,7 +17,7 @@ from menu import MazeMenu
 from solver import MazeSolver
 
 
-def main():
+def main() -> None:
     config = Parser("config.txt")
 
     maze = Maze(config)

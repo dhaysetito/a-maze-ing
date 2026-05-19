@@ -82,6 +82,10 @@ class MazeGenerator:
 
     @staticmethod
     def save_maze(maze: Maze, config: Parser, solution: str) -> None:
+        assert config.output_file is not None
+        assert config.entry is not None
+        assert config.exit is not None
+
         try:
             with open(config.output_file, "w") as file:
                 for row in maze.grid:
@@ -90,11 +94,11 @@ class MazeGenerator:
                     # print("".join(maze.cell_to_hex(c) for c in row))
 
                 file.write("\n")
-                file.write(str(config.entry[0]) + "," + str(config.entry[1]))
+                file.write(f"{str(config.entry[0])},{str(config.entry[1])}")
                 file.write("\n")
-                file.write(str(config.exit[0]) + "," + str(config.exit[1]))
+                file.write(f"{str(config.exit[0])},{str(config.exit[1])}")
                 file.write("\n")
-                file.write(solution + "\n")
+                file.write(f"{solution}\n")
 
         except OSError as e:
             raise MazeError("Can't create file.") from e

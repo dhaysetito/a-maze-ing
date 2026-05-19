@@ -18,11 +18,10 @@ from parser import Parser
 
 
 class MazeSolver:
-    def __init__(
-        self,
-        maze: Maze,
-        config: Parser,
-    ) -> None:
+    def __init__(self, maze: Maze, config: Parser) -> None:
+        assert config.entry is not None
+        assert config.exit is not None
+
         self.maze = maze
         self.entry = config.entry
         self.exit = config.exit
@@ -42,7 +41,7 @@ class MazeSolver:
         """Reconstruct shortest path."""
 
         path = []
-        current = self.exit
+        current: tuple[int, int] | None = self.exit
 
         while current is not None:
             path.append(current)
@@ -82,19 +81,14 @@ class MazeSolver:
 
         return "".join(directions)
 
-    def solve(
-        self,
-    ) -> list[tuple[int, int]]:
+    def solve(self) -> list[tuple[int, int]]:
         """Solve maze using BFS."""
 
         queue = deque([self.entry])
 
         visited = {self.entry}
 
-        parents: dict[
-            tuple[int, int],
-            tuple[int, int] | None,
-        ] = {
+        parents: dict[tuple[int, int], tuple[int, int] | None] = {
             self.entry: None
         }
 
