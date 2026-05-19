@@ -90,9 +90,7 @@ class Maze:
         cell = self.get_cell(x, y)
 
         for direction, nx, ny in self.neighbors(x, y):
-
             if not cell.has_wall(direction):
-
                 neighbors.append((nx, ny))
 
         return neighbors
