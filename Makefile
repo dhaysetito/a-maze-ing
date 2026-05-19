@@ -12,8 +12,6 @@
 PYTHON = python3
 MAIN   = a_maze_ing.py
 
-.PHONY: install run debug clean lint lint-strict
-
 # ********************************* INSTALL **********************************
 install:
 	$(PYTHON) -m pip install --upgrade pip
@@ -46,3 +44,5 @@ lint:
 lint-strict:
 	flake8 .
 	mypy . --strict
+
+.PHONY: install run debug clean lint lint-strict

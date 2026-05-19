@@ -13,20 +13,40 @@
 # ****************************************************************************
 
 DEFAULT_THEME: dict[str, str] = {
-    "path": "\x1b[38;5;110m",
-    "entry": "\x1b[38;5;108m",
-    "exit": "\x1b[38;5;131m",
+    "path": (
+        "\x1b[38;5;15m"
+        "\x1b[48;5;237m"
+    ),
+    "entry": (
+        "\x1b[48;5;15m"
+        "\x1b[38;5;196m"
+    ),
+    "exit": (
+        "\x1b[48;5;15m"
+        "\x1b[38;5;27m"
+    ),
     "wall": "\x1b[38;5;240m",
-    "bg": "\x1b[48;5;237m",
+    "bg": "\x1b[48;5;15m",
+    "wall_block": "██",
+    "path_block": "  ",
+    "entry_block": "◉◉",
+    "exit_block": "◈◈",
     "reset": "\x1b[0m",
 }
 
 NORD_THEME: dict[str, str] = {
-    "path": "\033[33m",
+    "path": (
+        "\x1b[38;5;15m"
+        "\x1b[48;5;230m"
+    ),
     "entry": "\033[32m",
     "exit": "\033[31m",
     "wall": "\033[38;5;130m",
     "bg": "\033[30m",
+    "wall_block": "██",
+    "path_block": "  ",
+    "entry_block": "██",
+    "exit_block": "██",
     "reset": "\033[0m",
 }
 
@@ -36,33 +56,64 @@ DRACULA_THEME: dict[str, str] = {
     "exit": "\x1b[38;5;203m",
     "wall": "\x1b[38;5;61m",
     "bg": "\x1b[48;5;236m",
+    "wall_block": "██",
+    "path_block": "  ",
+    "entry_block": "██",
+    "exit_block": "██",
     "reset": "\x1b[0m",
 }
 
 LUFFY_THEME: dict[str, str] = {
-    "path": "\x1b[38;5;220m",
+    "path": (
+        "\x1b[38;5;15m"
+        "\x1b[48;5;254m"
+    ),
     "entry": "\x1b[38;5;196m",
     "exit": "\x1b[38;5;27m",
     "wall": "\x1b[38;5;221m",
     "bg": "\x1b[48;5;234m",
+    "wall_block": "██",
+    "path_block": "  ",
+    "entry_block": "██",
+    "exit_block": "██",
     "reset": "\x1b[0m",
 }
 
 ZORO_THEME: dict[str, str] = {
-    "path": "\x1b[38;5;118m",
+    "path": (
+        "\x1b[38;5;15m"
+        "\x1b[48;5;150m"
+    ),
     "entry": "\x1b[38;5;46m",
     "exit": "\x1b[38;5;161m",
     "wall": "\x1b[38;5;34m",
     "bg": "\x1b[48;5;232m",
+    "wall_block": "██",
+    "path_block": "  ",
+    "entry_block": "██",
+    "exit_block": "██",
     "reset": "\x1b[0m",
 }
 
 BROOK_THEME: dict[str, str] = {
-    "path": "\x1b[38;5;39m",
-    "entry": "\x1b[38;5;15m",
-    "exit": "\x1b[38;5;214m",
+    "path": (
+        "\x1b[38;5;17m"
+        "\x1b[48;5;237m"
+    ),
+    "entry": (
+        "\x1b[48;5;17m"
+        "\x1b[38;5;237m"
+    ),
+    "exit": (
+        "\x1b[48;5;17m"
+        "\x1b[38;5;237m"
+    ),
     "wall": "\x1b[38;5;232m",
     "bg": "\x1b[48;5;17m",
+    "wall_block": "██",
+    "path_block": "  ",
+    "entry_block": "♪♪",
+    "exit_block": "♪♪",
     "reset": "\x1b[0m",
 }
 

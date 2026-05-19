@@ -1,14 +1,25 @@
+# ****************************************************************************
+#
+#    renderer.py
+#
+#    By: dhde-lim <dhde-lim@student.42.rio> and
+#        ganselmo <ganselmo@student.42.rio>
+#
+#    Description: Terminal maze renderer responsible for drawing walls,
+#                 paths, entry and exit points using ANSI color themes
+#                 and block-based visualization.
+#    Created: 2026/05/19
+#
+# ****************************************************************************
+
 from __future__ import annotations
 
 from maze_structure import Maze
 from parser import Parser
-from themes import DEFAULT_THEME
+import themes
 
 
 class MazeRenderer:
-
-    BLOCK = "██"
-
     DIRECTION_OFFSETS: dict[str, tuple[int, int]] = {
         "N": (0, -1),
         "S": (0, 1),
@@ -29,7 +40,7 @@ class MazeRenderer:
         self.path = path
 
         if theme is None:
-            self.theme = DEFAULT_THEME
+            self.theme = themes.DEFAULT_THEME
 
         else:
             self.theme = theme
@@ -44,11 +55,17 @@ class MazeRenderer:
     def _update_theme(self) -> None:
         """Update renderer theme colors."""
 
+        self.wall_block = self.theme["wall_block"]
+        self.path_block = self.theme["path_block"]
+        self.entry_block = self.theme["entry_block"]
+        self.exit_block = self.theme["exit_block"]
+
         self.wall_color = self.theme["wall"]
         self.bg_color = self.theme["bg"]
         self.path_color = self.theme["path"]
         self.entry_color = self.theme["entry"]
         self.exit_color = self.theme["exit"]
+
         self.reset = self.theme["reset"]
 
     def _create_canvas(self) -> None:
@@ -58,31 +75,18 @@ class MazeRenderer:
             [
                 (
                     f"{self.wall_color}"
-                    f"{self.BLOCK}"
+                    f"{self.wall_block}"
                     f"{self.reset}"
                 )
-                for _ in range(
-                    self.real_width
-                )
+                for _ in range(self.real_width)
             ]
-            for _ in range(
-                self.real_height
-            )
+            for _ in range(self.real_height)
         ]
 
-    def _paint(
-        self,
-        x: int,
-        y: int,
-        color: str,
-    ) -> None:
+    def _paint(self, x: int, y: int, color: str, block: str) -> None:
         """Paint a single block."""
 
-        self.canvas[y][x] = (
-            f"{color}"
-            f"{self.BLOCK}"
-            f"{self.reset}"
-        )
+        self.canvas[y][x] = f"{color}{block}{self.reset}"
 
     def _draw_cells(self) -> None:
         """Draw maze cells."""
@@ -99,6 +103,7 @@ class MazeRenderer:
                     cx,
                     cy,
                     self.bg_color,
+                    self.path_block,
                 )
 
                 cell = self.maze.grid[y][x]
@@ -129,6 +134,7 @@ class MazeRenderer:
                                 nx,
                                 ny,
                                 self.bg_color,
+                                self.path_block,
                             )
 
     def _draw_path(self) -> None:
@@ -141,7 +147,7 @@ class MazeRenderer:
             vx = (px * 2) + 1
             vy = (py * 2) + 1
 
-            self._paint(vx, vy, self.path_color)
+            self._paint(vx, vy, self.path_color, self.path_block)
 
             if i < len(self.path) - 1:
                 nx, ny = self.path[i + 1]
@@ -153,7 +159,12 @@ class MazeRenderer:
                     0 <= connector_x < self.real_width
                     and 0 <= connector_y < self.real_height
                 ):
-                    self._paint(connector_x, connector_y, self.path_color)
+                    self._paint(
+                        connector_x,
+                        connector_y,
+                        self.path_color,
+                        self.path_block
+                    )
 
     def _draw_entry_exit(self) -> None:
         """Draw entry and exit."""
@@ -167,12 +178,14 @@ class MazeRenderer:
             (entry_x * 2) + 1,
             (entry_y * 2) + 1,
             self.entry_color,
+            self.entry_block,
         )
 
         self._paint(
             (exit_x * 2) + 1,
             (exit_y * 2) + 1,
             self.exit_color,
+            self.exit_block,
         )
 
     def render(self) -> None:

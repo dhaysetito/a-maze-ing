@@ -1,9 +1,13 @@
 # ****************************************************************************
 #
-#    a_maze_ing.py
+#    renderer.py
 #
 #    By: dhde-lim <dhde-lim@student.42.rio> and
 #        ganselmo <ganselmo@student.42.rio>
+#
+#    Description: Terminal maze renderer responsible for drawing walls,
+#                 paths, entry and exit points using ANSI color themes
+#                 and block-based visualization.
 #
 #    Created: 2026/04/22
 #

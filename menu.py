@@ -155,12 +155,16 @@ class MazeMenu:
         """Save maze to output file."""
 
         try:
+            new_file = input(
+                f"Enter the name of the file to save"
+                f" ({self.config.output_file}): "
+                )
+            if new_file:
+                self.config.output_file = new_file
             solver = MazeSolver(self.maze, self.config)
             solver.solve()
             solution = solver.path_to_directions()
             self.generator.save_maze(self.maze, self.config, solution)
-
-            print(f"\nMaze saved to {self.config.output_file}\n")
             self.save = True
 
         except Exception:
