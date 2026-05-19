@@ -14,8 +14,7 @@
 
 DEFAULT_THEME: dict[str, str] = {
     "path": (
-        "\x1b[38;5;15m"
-        "\x1b[48;5;237m"
+        "\x1b[48;5;15m"
     ),
     "entry": (
         "\x1b[48;5;15m"
@@ -27,11 +26,14 @@ DEFAULT_THEME: dict[str, str] = {
     ),
     "wall": "\x1b[38;5;240m",
     "bg": "\x1b[48;5;15m",
-    "wall_block": "██",
+    "wall_block": "⬛",
     "path_block": "  ",
-    "entry_block": "◉◉",
-    "exit_block": "◈◈",
+    "entry_block": "🟥",
+    "exit_block": "🟩",
+    "solve_block": "🟨",
     "reset": "\x1b[0m",
+    "blocked": "\x1b[38;5;226m",
+    "blocked_block": "🟦",
 }
 
 NORD_THEME: dict[str, str] = {
@@ -47,7 +49,10 @@ NORD_THEME: dict[str, str] = {
     "path_block": "  ",
     "entry_block": "██",
     "exit_block": "██",
+    "solve_block": "··",
     "reset": "\033[0m",
+    "blocked": "\x1b[38;5;226m",
+    "blocked_block": "▒▒",
 }
 
 DRACULA_THEME: dict[str, str] = {
@@ -60,13 +65,15 @@ DRACULA_THEME: dict[str, str] = {
     "path_block": "  ",
     "entry_block": "██",
     "exit_block": "██",
+    "solve_block": "··",
     "reset": "\x1b[0m",
+    "blocked_block": "▒▒",
+    "blocked": "\x1b[38;5;226m",
 }
 
 LUFFY_THEME: dict[str, str] = {
     "path": (
-        "\x1b[38;5;15m"
-        "\x1b[48;5;254m"
+        "\x1b[48;5;234m"
     ),
     "entry": "\x1b[38;5;196m",
     "exit": "\x1b[38;5;27m",
@@ -74,9 +81,12 @@ LUFFY_THEME: dict[str, str] = {
     "bg": "\x1b[48;5;234m",
     "wall_block": "██",
     "path_block": "  ",
-    "entry_block": "██",
-    "exit_block": "██",
+    "entry_block": "👒",
+    "exit_block": "🧰",
+    "solve_block": "🍖",
     "reset": "\x1b[0m",
+    "blocked": "\x1b[38;5;226m",
+    "blocked_block": "💀",
 }
 
 ZORO_THEME: dict[str, str] = {
@@ -92,13 +102,15 @@ ZORO_THEME: dict[str, str] = {
     "path_block": "  ",
     "entry_block": "██",
     "exit_block": "██",
+    "solve_block": "··",
     "reset": "\x1b[0m",
+    "blocked": "\x1b[38;5;226m",
+    "blocked_block": "💀",
 }
 
 BROOK_THEME: dict[str, str] = {
     "path": (
-        "\x1b[38;5;17m"
-        "\x1b[48;5;237m"
+        "\x1b[48;5;17m"
     ),
     "entry": (
         "\x1b[48;5;17m"
@@ -114,7 +126,34 @@ BROOK_THEME: dict[str, str] = {
     "path_block": "  ",
     "entry_block": "♪♪",
     "exit_block": "♪♪",
+    "solve_block": "♪♪",
     "reset": "\x1b[0m",
+    "blocked": "\x1b[38;5;226m",
+    "blocked_block": "💀",
+}
+
+GAME_THEME: dict[str, str] = {
+    "path": (
+        "\x1b[48;5;15m"
+    ),
+    "entry": (
+        "\x1b[48;5;15m"
+        "\x1b[38;5;196m"
+    ),
+    "exit": (
+        "\x1b[48;5;15m"
+        "\x1b[38;5;27m"
+    ),
+    "wall": "\x1b[38;5;15m",
+    "bg": "\x1b[48;5;15m",
+    "wall_block": "🧱",
+    "path_block": "  ",
+    "entry_block": "👻",
+    "exit_block": "🚪",
+    "solve_block": "👻",
+    "reset": "\x1b[0m",
+    "blocked": "\x1b[38;5;226m",
+    "blocked_block": "42",
 }
 
 THEMES: dict[str, tuple[str, dict[str, str]]] = {
@@ -124,4 +163,5 @@ THEMES: dict[str, tuple[str, dict[str, str]]] = {
     "4": ("Luffy", LUFFY_THEME),
     "5": ("Zoro", ZORO_THEME),
     "6": ("Brook", BROOK_THEME),
+    "7": ("Game", GAME_THEME),
 }

@@ -22,6 +22,7 @@ class Cell:
         self.south = True
         self.west = True
         self.visited = False
+        self.blocked = False
 
     def has_wall(self, direction: str) -> bool:
         """Return whether a wall exists in the given direction."""
@@ -39,6 +40,14 @@ class Cell:
             )
 
         return mapping[direction]
+
+    def close_all_walls(self) -> None:
+        """Close all cell walls."""
+
+        self.north = True
+        self.east = True
+        self.south = True
+        self.west = True
 
 
 class Maze:

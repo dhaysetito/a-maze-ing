@@ -85,9 +85,7 @@ class MazeSolver:
         """Solve maze using BFS."""
 
         queue = deque([self.entry])
-
         visited = {self.entry}
-
         parents: dict[tuple[int, int], tuple[int, int] | None] = {
             self.entry: None
         }
@@ -96,32 +94,18 @@ class MazeSolver:
             current = queue.popleft()
 
             if current == self.exit:
-                self.path = (
-                    self._reconstruct_path(
-                        parents
-                    )
-                )
-
+                self.path = self._reconstruct_path(parents)
                 return self.path
 
             x, y = current
-
-            neighbors = (
-                self.maze.reachable_neighbors(
-                    x,
-                    y,
-                )
-            )
+            neighbors = self.maze.reachable_neighbors(x, y)
 
             for neighbor in neighbors:
 
                 if neighbor not in visited:
                     visited.add(neighbor)
-
                     parents[neighbor] = current
-
                     queue.append(neighbor)
-
         self.path = []
 
         return self.path

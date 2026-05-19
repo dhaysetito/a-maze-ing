@@ -33,6 +33,7 @@ class MazeMenu:
         "4": themes.LUFFY_THEME,
         "5": themes.ZORO_THEME,
         "6": themes.BROOK_THEME,
+        "7": themes.GAME_THEME
     }
 
     def __init__(
@@ -107,15 +108,10 @@ class MazeMenu:
         """Generate a new maze."""
 
         self.maze = Maze(self.config)
-
         self.generator = MazeGenerator(self.maze, self.config)
-
         self.generator.generate()
-
         solver = MazeSolver(self.maze, self.config)
-
         self.path = solver.solve()
-
         self.save = False
 
     def _toggle_path(self) -> None:
@@ -140,6 +136,7 @@ class MazeMenu:
         print("[4] Luffy")
         print("[5] Zoro")
         print("[6] Brook")
+        print("[7] Game")
 
         print()
 
@@ -147,7 +144,6 @@ class MazeMenu:
 
         if choice in themes.THEMES:
             name, theme = (themes.THEMES[choice])
-
             self.current_theme = theme
             self.current_theme_name = name
 
@@ -207,7 +203,6 @@ class MazeMenu:
 
         running = True
         while running:
-
             self._clear_screen()
             self._render()
             self._show_menu()

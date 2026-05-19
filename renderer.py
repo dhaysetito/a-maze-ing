@@ -59,12 +59,15 @@ class MazeRenderer:
         self.path_block = self.theme["path_block"]
         self.entry_block = self.theme["entry_block"]
         self.exit_block = self.theme["exit_block"]
+        self.solve_block = self.theme["solve_block"]
+        self.blocked_block = self.theme["blocked_block"]
 
         self.wall_color = self.theme["wall"]
         self.bg_color = self.theme["bg"]
         self.path_color = self.theme["path"]
         self.entry_color = self.theme["entry"]
         self.exit_color = self.theme["exit"]
+        self.blocked_color = self.theme["blocked"]
 
         self.reset = self.theme["reset"]
 
@@ -96,38 +99,40 @@ class MazeRenderer:
             for x in range(self.maze.width):
 
                 cx = (x * 2) + 1
-
                 cy = (y * 2) + 1
-
-                self._paint(
-                    cx,
-                    cy,
-                    self.bg_color,
-                    self.path_block,
-                )
 
                 cell = self.maze.grid[y][x]
 
-                for direction, (
-                    dx,
-                    dy,
-                ) in (
+                if cell.blocked:
+
+                    self._paint(
+                        cx,
+                        cy,
+                        self.blocked_color,
+                        self.blocked_block,
+                    )
+
+                else:
+
+                    self._paint(
+                        cx,
+                        cy,
+                        self.bg_color,
+                        self.path_block,
+                    )
+
+                for direction, (dx, dy) in (
                     self.DIRECTION_OFFSETS.items()
                 ):
 
-                    if not cell.has_wall(
-                        direction
-                    ):
+                    if not cell.has_wall(direction):
 
                         nx = cx + dx
-
                         ny = cy + dy
 
                         if (
-                            0 <= nx
-                            < self.real_width
-                            and 0 <= ny
-                            < self.real_height
+                            0 <= nx < self.real_width
+                            and 0 <= ny < self.real_height
                         ):
 
                             self._paint(
@@ -147,7 +152,7 @@ class MazeRenderer:
             vx = (px * 2) + 1
             vy = (py * 2) + 1
 
-            self._paint(vx, vy, self.path_color, self.path_block)
+            self._paint(vx, vy, self.path_color, self.solve_block)
 
             if i < len(self.path) - 1:
                 nx, ny = self.path[i + 1]
@@ -163,7 +168,7 @@ class MazeRenderer:
                         connector_x,
                         connector_y,
                         self.path_color,
-                        self.path_block
+                        self.solve_block
                     )
 
     def _draw_entry_exit(self) -> None:

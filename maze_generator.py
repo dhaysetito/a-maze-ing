@@ -18,12 +18,17 @@ from parser import Parser
 class MazeGenerator:
     def __init__(self, maze: Maze, config: Parser) -> None:
         self.maze = maze
+        self.config = config
         self.random = random.Random(config.seed)
+        self.blocked = False
 
     def _unvisited_neighbors(self, x: int, y: int) -> list[tuple[int, int]]:
         result: list[tuple[int, int]] = []
+
         for _, n_x, n_y in self.maze.neighbors(x, y):
-            if not self.maze.get_cell(n_x, n_y).visited:
+            neighbor = self.maze.get_cell(n_x, n_y)
+
+            if not neighbor.visited and not neighbor.blocked:
                 result.append((n_x, n_y))
         return result
 
@@ -32,19 +37,22 @@ class MazeGenerator:
             for cell in row:
                 cell.visited = False
 
-    def open_entry_exit(self, entry: tuple[int, int], exit: tuple[int, int]
-                        ) -> None:
-        ex, ey = entry
-        tx, ty = exit
-
-        if not self.maze.in_bounds(ex, ey):
-            raise MazeError("Entry out of bounds")
-
-        if not self.maze.in_bounds(tx, ty):
-            raise MazeError("Exit out of bounds")
+    def _open_entry_exit(self) -> None:
+        # TODO: modificar logica se quiser funcionar para qualquer
+        # entrada e saida
+        assert self.config.entry is not None
+        assert self.config.exit is not None
+        entry = self.config.entry
+        exit = self.config.exit
 
         if entry == exit:
             raise MazeError("Entry and exit must be different")
+
+        if self.maze.get_cell(entry[0], entry[1]).blocked:
+            raise MazeError("Entry canot be inside the 42 pattern")
+
+        if self.maze.get_cell(exit[0], exit[1]).blocked:
+            raise MazeError("Exit canot be inside the 42 pattern")
 
         self.entry = entry
         self.exit = exit
@@ -53,8 +61,8 @@ class MazeGenerator:
     def generate(self) -> None:
         stack: list[tuple[int, int]] = []
 
-        # Deveria sempre começar em 0,0?
-        # start in (0,0)
+        self._create_42_pattern()
+        self._open_entry_exit()
         x, y = 0, 0
         self.maze.get_cell(x, y).visited = True
 
@@ -79,6 +87,48 @@ class MazeGenerator:
                 break
 
         self._reset_visited()
+
+    def _create_42_pattern(self) -> None:
+        """Create isolated 42 pattern."""
+
+        if (self.maze.width < 12 or self.maze.height < 7):
+            return
+
+        cx = (self.maze.width // 2) - 4
+        cy = (self.maze.height // 2) - 2
+
+        pattern = [
+            # 4
+            (cx, cy),
+            (cx, cy + 1),
+            (cx, cy + 2),
+            (cx + 1, cy + 2),
+            (cx + 2, cy + 2),
+            (cx + 2, cy + 3),
+            (cx + 2, cy + 4),
+
+            # 2
+            (cx + 4, cy),
+            (cx + 5, cy),
+            (cx + 6, cy),
+            (cx + 6, cy + 1),
+            (cx + 4, cy + 2),
+            (cx + 5, cy + 2),
+            (cx + 6, cy + 2),
+            (cx + 4, cy + 3),
+            (cx + 4, cy + 4),
+            (cx + 5, cy + 4),
+            (cx + 6, cy + 4),
+        ]
+
+        for x, y in pattern:
+
+            if (
+                0 <= x < self.maze.width
+                and 0 <= y < self.maze.height
+            ):
+                cell = self.maze.get_cell(x, y)
+                cell.blocked = True
 
     @staticmethod
     def save_maze(maze: Maze, config: Parser, solution: str) -> None:
