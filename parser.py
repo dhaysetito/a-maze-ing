@@ -163,9 +163,3 @@ class Parser:
 
         if self.perfect is None:
             raise ConfigError.missing_field("[PERFECT]")
-
-
-if __name__ == "__main__":
-    config = Parser("config.txt")
-    print(config.width)
-    print(config.output_file)

@@ -16,21 +16,26 @@ from exceptions import MazeError, ConfigError
 from menu import MazeMenu
 from solver import MazeSolver
 
+
+def main():
+    config = Parser("config.txt")
+
+    maze = Maze(config)
+
+    gen = MazeGenerator(maze, config)
+    gen.generate()
+
+    solver = MazeSolver(maze, config)
+    solver.solve()
+    solution = solver.path_to_directions()
+    gen.save_maze(maze, config, solution)
+
+    MazeMenu(maze, gen, config).run()
+
+
 if __name__ == "__main__":
     try:
-        config = Parser("config.txt")
-
-        maze = Maze(config)
-
-        gen = MazeGenerator(maze, config)
-        gen.generate()
-
-        solver = MazeSolver(maze, config)
-        solver.solve()
-        solution = solver.path_to_directions()
-        gen.save_maze(maze, config, solution)
-
-        MazeMenu(maze, gen, config).run()
+        main()
 
     except ConfigError as e:
         print(f"Config error: {e}")

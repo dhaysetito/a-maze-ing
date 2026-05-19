@@ -43,6 +43,9 @@ class Cell:
 
 class Maze:
     def __init__(self, config: Parser) -> None:
+        assert config.width is not None
+        assert config.height is not None
+
         self.width = config.width
         self.height = config.height
 
@@ -57,7 +60,7 @@ class Maze:
     def in_bounds(self, x: int, y: int) -> bool:
         return 0 <= x < self.width and 0 <= y < self.height
 
-    def neighbors(self, x: int, y: int) -> list[tuple[int, int]]:
+    def neighbors(self, x: int, y: int) -> list[tuple[str, int, int]]:
         directions = [
             ("N", x, y - 1),
             ("E", x + 1, y),
@@ -149,25 +152,3 @@ class Maze:
             [self.cell_to_hex(cell) for cell in row]
             for row in self.grid
         ]
-
-
-if __name__ == "__main__":
-
-    import random
-
-    maze = Maze(5, 4)
-
-    random.seed(0)
-
-    for y in range(maze.height):
-        for x in range(maze.width):
-
-            neighbors = maze.neighbors(x, y)
-
-            if neighbors:
-                _, nx, ny = random.choice(neighbors)
-
-                maze.remove_wall(x, y, nx, ny)
-
-    for row in maze.to_hex_grid():
-        print("".join(row))

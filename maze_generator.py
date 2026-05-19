@@ -98,13 +98,3 @@ class MazeGenerator:
 
         except OSError as e:
             raise MazeError("Can't create file.") from e
-
-
-if __name__ == "__main__":
-    maze = Maze(5, 5)
-    gen = MazeGenerator(maze, seed=0)
-    gen.generate()
-    gen.open_entry_exit((1, 1), (4, 4))
-
-    for row in maze.grid:
-        print("".join(maze.cell_to_hex(c) for c in row))
