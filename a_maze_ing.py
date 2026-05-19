@@ -13,6 +13,7 @@
 #
 # ****************************************************************************
 
+import sys
 from maze_generator import MazeGenerator
 from maze_structure import Maze
 from parser import Parser
@@ -22,24 +23,26 @@ from solver import MazeSolver
 
 
 def main() -> None:
-    config = Parser("config.txt")
 
-    maze = Maze(config)
+    if len(sys.argv) != 2:
+        print("Usage: python3 a_maze_ing.py config.txt")
+        sys.exit(1)
 
-    gen = MazeGenerator(maze, config)
-    gen.generate()
-
-    solver = MazeSolver(maze, config)
-    solver.solve()
-    solution = solver.path_to_directions()
-    gen.save_maze(maze, config, solution)
-
-    MazeMenu(maze, gen, config).run()
-
-
-if __name__ == "__main__":
     try:
-        main()
+        config_path = sys.argv[1]
+        config = Parser(config_path)
+
+        maze = Maze(config)
+
+        gen = MazeGenerator(maze, config)
+        gen.generate()
+
+        solver = MazeSolver(maze, config)
+        solver.solve()
+        solution = solver.path_to_directions()
+        gen.save_maze(maze, config, solution)
+
+        MazeMenu(maze, gen, config).run()
 
     except ConfigError as e:
         print(f"Config error: {e}")
@@ -47,8 +50,12 @@ if __name__ == "__main__":
     except MazeError as e:
         print(f"Maze error: {e}")
 
+    except KeyboardInterrupt:
+        print("\nQue a força esteja sempre com você!")
+
     except Exception as e:
         print(f"Error found: {e}")
 
-    except KeyboardInterrupt:
-        print("\nQue a força esteja sempre com você!")
+
+if __name__ == "__main__":
+    main()

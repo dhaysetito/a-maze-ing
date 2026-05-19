@@ -23,6 +23,7 @@ from maze_structure import Maze
 from parser import Parser
 from renderer import MazeRenderer
 from solver import MazeSolver
+from audio_manager import AudioManager
 
 
 class MazeMenu:
@@ -35,6 +36,16 @@ class MazeMenu:
         "5": themes.ZORO_THEME,
         "6": themes.BROOK_THEME,
         "7": themes.GAME_THEME
+    }
+
+    THEME_MUSIC: dict[str, str] = {
+        "1": " ",
+        "2": " ",
+        "3": " ",
+        "4": "songs/we_are.mp3",
+        "5": "songs/wano_kuni.mp3",
+        "6": "songs/binks_sake.mp3",
+        "7": "songs/terror.mp3",
     }
 
     def __init__(
@@ -54,7 +65,7 @@ class MazeMenu:
 
         self.current_theme = themes.DEFAULT_THEME
         self.current_theme_name = "Default"
-
+        self.audio = AudioManager()
         self.renderer = MazeRenderer(
             self.maze,
             self.config,
@@ -88,7 +99,7 @@ class MazeMenu:
 
         print()
 
-        print("========== Menu ==========")
+        print(f"{'═'*15} Menu {'═'*15}")
         print("[1] Regenerate maze")
         if not self.show_path:
             print("[2] Toggle shortest path (Disabled)")
@@ -101,13 +112,28 @@ class MazeMenu:
             print("[4] Save maze (not saved)")
         print("[5] Animate solution")
         print("[0] Exit")
-        print("================================")
+        print(f"{'═'*36}")
 
         print()
 
     def _show_title(self) -> None:
         """Show maze title and pattern status."""
-        print(f"\n{'='*20} A-Maze-ing {'='*20}")
+        # print(f"\n\033[1m\033[38;5;220m"
+        #       f"{'═'*20} A-Maze-ing {'═'*20}\n"
+        #       f"\033[0m\n")
+        print(
+            "\033[1m"
+            "\033[38;5;220m"
+            r"""
+             █████╗       ███╗   ███╗ █████╗ ███████╗███████╗
+            ██╔══██╗      ████╗ ████║██╔══██╗╚══███╔╝██╔════╝
+            ███████║█████╗██╔████╔██║███████║  ███╔╝ █████╗
+            ██╔══██║╚════╝██║╚██╔╝██║██╔══██║ ███╔╝  ██╔══╝
+            ██║  ██║      ██║ ╚═╝ ██║██║  ██║███████╗███████╗
+            ╚═╝  ╚═╝      ╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝╚══════╝
+                """
+            "\033[0m"
+            )
 
         if not self.generator.has_42_pattern:
             print("42 pattern was not generated.\n")
@@ -129,23 +155,25 @@ class MazeMenu:
     def _change_theme(self) -> None:
         """Change renderer theme."""
 
-        print("\nChoose a theme:")
-        print("[1] Default")
-        print("[2] Nord")
-        print("[3] Dracula")
-        print("[4] Luffy")
-        print("[5] Zoro")
-        print("[6] Brook")
-        print("[7] Game")
+        print(f"\n{'═'*9} Choose a Theme: {'═'*10}")
+        for key, (name, _) in themes.THEMES.items():
+            print(f"[{key}] {name}")
 
-        print()
-
-        choice = input("Theme: ").strip()
+        choice = input("\nTheme: ").strip()
 
         if choice in themes.THEMES:
-            name, theme = (themes.THEMES[choice])
+            name, theme = themes.THEMES[choice]
             self.current_theme = theme
             self.current_theme_name = name
+
+            if choice in self.THEME_MUSIC:
+                self.audio.play(self.THEME_MUSIC[choice])
+            else:
+                self.audio.stop()
+
+        else:
+            print("\nSelect a valid menu option (1-7).\n")
+            self._pause()
 
     def _save_maze(self) -> None:
         """Save maze to output file."""
@@ -186,6 +214,7 @@ class MazeMenu:
             self._animate_solution()
 
         elif choice == "0":
+            self.audio.stop()
             print("\nQue a força esteja sempre com você!\n")
             return False
 
@@ -215,7 +244,7 @@ class MazeMenu:
             self._show_title()
             self.renderer.render()
 
-            time.sleep(0.01)
+            time.sleep(0.05)
 
         self.path = path
         self.show_path = True
@@ -223,12 +252,17 @@ class MazeMenu:
     def run(self) -> None:
         """Start interactive menu loop."""
 
-        running = True
-        while running:
-            self._clear_screen()
-            self._show_title()
-            self._render()
-            self._show_menu()
+        while True:
+            try:
+                self._clear_screen()
+                self._show_title()
+                self._render()
+                self._show_menu()
 
-            choice = input("Option: ").strip()
-            running = self._handle_choice(choice)
+                choice = input("Option: ").strip()
+                if not self._handle_choice(choice):
+                    break
+            except KeyboardInterrupt:
+                self.audio.stop()
+                print("\nQue a força esteja sempre com você!")
+                break

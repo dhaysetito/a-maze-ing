@@ -51,9 +51,6 @@ class MazeGenerator:
         entry = self.config.entry
         exit = self.config.exit
 
-        if entry == exit:
-            raise MazeError("Entry and exit must be different")
-
         if self.maze.get_cell(entry[0], entry[1]).blocked:
             raise MazeError("Entry cannot be inside the 42 pattern")
 

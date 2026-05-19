@@ -14,7 +14,7 @@
 # ****************************************************************************
 
 # TODO adicionar docstrings
-from exceptions import ConfigError
+from exceptions import ConfigError, MazeError
 
 
 class Parser:
@@ -115,6 +115,8 @@ class Parser:
                 raise ConfigError.invalid_bound_coordinates(
                     (f"[{key}]"), self.width, self.height
                     )
+            if self.exit == self.entry:
+                raise MazeError("Entry and exit must be different")
 
         elif key == "OUTPUT_FILE":
             if not value:
