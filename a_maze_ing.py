@@ -16,34 +16,17 @@ from exceptions import MazeError, ConfigError
 from renderer import render_ascii_maze
 
 
-def save_maze(config: Parser, maze: Maze) -> None:
-    try:
-        with open(config.output_file, "w") as file:
-            for row in maze.grid:
-                line = "".join(maze.cell_to_hex(c) for c in row)
-                file.write(line + "\n")
-                #print("".join(maze.cell_to_hex(c) for c in row))
-
-            file.write("\n")
-            file.write(str(config.entry[0]) + "," + str(config.entry[1]))
-            file.write("\n")
-            file.write(str(config.exit[0]) + "," + str(config.exit[1]))
-            file.write("\n")
-
-    except ValueError as e:
-        raise MazeError("Can't create file.") from e
-
-
 if __name__ == "__main__":
     try:
         config = Parser("config.txt")
 
-        maze = Maze(config.width, config.height)
+        maze = Maze(config)
 
-        gen = MazeGenerator(maze)
+        gen = MazeGenerator(maze, config)
 
         gen.generate()
-
+        gen.save_maze(maze, config)
+  
         render_ascii_maze(
             maze,
             {
@@ -52,7 +35,6 @@ if __name__ == "__main__":
             }
         )
 
-        save_maze(config, maze)
 
     except ConfigError as e:
         print(f"Config error: {e}")

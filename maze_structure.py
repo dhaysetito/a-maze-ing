@@ -12,6 +12,7 @@
 #
 # ****************************************************************************
 
+from parser import Parser
 
 class Cell:
     def __init__(self) -> None:
@@ -40,13 +41,13 @@ class Cell:
 
 
 class Maze:
-    def __init__(self, width: int, height: int) -> None:
-        self.width = width
-        self.height = height
+    def __init__(self, config: Parser) -> None:
+        self.width = config.width
+        self.height = config.height
 
         self.grid = [
-            [Cell() for _ in range(width)]
-            for _ in range(height)
+            [Cell() for _ in range(self.width)]
+            for _ in range(self.height)
         ]
 
     def get_cell(self, x: int, y: int) -> Cell:

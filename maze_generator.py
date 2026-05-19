@@ -12,12 +12,12 @@
 import random
 from maze_structure import Maze
 from exceptions import MazeError
-
+from parser import Parser
 
 class MazeGenerator:
-    def __init__(self, maze: Maze, seed: int | None = None) -> None:
+    def __init__(self, maze: Maze, config: Parser) -> None:
         self.maze = maze
-        self.random = random.Random(seed)
+        self.random = random.Random(config.seed)
 
     def _unvisited_neighbors(self, x: int, y: int) -> list[tuple[int, int]]:
         result: list[tuple[int, int]] = []
@@ -51,7 +51,7 @@ class MazeGenerator:
     def generate(self) -> None:
         stack: list[tuple[int, int]] = []
 
-		# Deveria sempre começar em 0,0?
+        # Deveria sempre começar em 0,0?
         # start in (0,0)
         x, y = 0, 0
         self.maze.get_cell(x, y).visited = True
@@ -77,6 +77,24 @@ class MazeGenerator:
                 break
 
         self._reset_visited()
+        
+    @staticmethod
+    def save_maze(maze: Maze, config: Parser) -> None:
+        try:
+            with open(config.output_file, "w") as file:
+                for row in maze.grid:
+                    line = "".join(maze.cell_to_hex(c) for c in row)
+                    file.write(line + "\n")
+                    # print("".join(maze.cell_to_hex(c) for c in row))
+
+                file.write("\n")
+                file.write(str(config.entry[0]) + "," + str(config.entry[1]))
+                file.write("\n")
+                file.write(str(config.exit[0]) + "," + str(config.exit[1]))
+                file.write("\n")
+
+        except ValueError as e:
+            raise MazeError("Can't create file.") from e
 
 
 if __name__ == "__main__":
