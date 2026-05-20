@@ -13,8 +13,8 @@
 #
 # ****************************************************************************
 
-import time
 import random
+import time
 
 from maze_structure import Maze
 from exceptions import MazeError
@@ -22,7 +22,15 @@ from parser import Parser
 
 
 class MazeGenerator:
+    """Procedural DFS maze generator."""
     def __init__(self, maze: Maze, config: Parser) -> None:
+        """
+        Initialize maze generator.
+
+        Args:
+            maze: Maze structure.
+            config: Maze configuration parser.
+        """
         self.maze = maze
         self.config = config
         self.random = random.Random(config.seed)
@@ -31,6 +39,18 @@ class MazeGenerator:
         self.loops_added = 0
 
     def _unvisited_neighbors(self, x: int, y: int) -> list[tuple[int, int]]:
+        """
+        Return unvisited reachable neighbors.
+
+        Filters blocked and already visited cells.
+
+        Args:
+            x: Current cell x coordinate.
+            y: Current cell y coordinate.
+
+        Returns:
+            List of unvisited neighbor coordinates.
+        """
         result: list[tuple[int, int]] = []
 
         for _, n_x, n_y in self.maze.neighbors(x, y):
@@ -41,6 +61,7 @@ class MazeGenerator:
         return result
 
     def _reset_visited(self) -> None:
+        """Reset visited state of all cells."""
         for row in self.maze.grid:
             for cell in row:
                 cell.visited = False
@@ -52,6 +73,12 @@ class MazeGenerator:
                 cell.blocked = False
 
     def _validate_entry_exit(self) -> None:
+        """
+        Validate entry and exit positions.
+
+        Ensures entry and exit are not placed
+        inside blocked 42 pattern cells.
+        """
         assert self.config.entry is not None
         assert self.config.exit is not None
         entry = self.config.entry
@@ -63,11 +90,14 @@ class MazeGenerator:
         if self.maze.get_cell(exit[0], exit[1]).blocked:
             raise MazeError("Exit cannot be inside the 42 pattern")
 
-        self.entry = entry
-        self.exit = exit
-
-    # Algorithm DFS - depth first search
     def generate(self) -> None:
+        """
+        Generate maze using DFS backtracking.
+
+        Traverses random unvisited neighbors while
+        removing walls between adjacent cells until
+        the maze becomes fully connected.
+        """
         start = time.perf_counter()
         stack: list[tuple[int, int]] = []
 
@@ -87,7 +117,6 @@ class MazeGenerator:
             if neighbors:
                 nx, ny = self.random.choice(neighbors)
 
-                # remove wall between (x,y) and (nx,ny)
                 self.maze.remove_wall(x, y, nx, ny)
 
                 stack.append((x, y))
@@ -108,15 +137,19 @@ class MazeGenerator:
         self._reset_visited()
 
     def _add_loops(self) -> None:
-        """Create extra maze loops safely."""
+        """
+        Create additional paths in non-perfect mazes.
 
+        Removes selected walls while preventing
+        large open areas and invalid structures.
+        """
         loops = (self.maze.width * self.maze.height) // 20
 
         created = 0
         attempts = 0
         max_attempts = loops * 20
 
-        while (created < loops and attempts < max_attempts):
+        while created < loops and attempts < max_attempts:
             attempts += 1
             x = self.random.randint(0, self.maze.width - 1)
             y = self.random.randint(0, self.maze.height - 1)
@@ -167,9 +200,13 @@ class MazeGenerator:
             self.loops_added += 1
 
     def _create_42_pattern(self) -> None:
-        """Create isolated 42 pattern."""
+        """
+        Create isolated 42 blocked pattern.
 
-        if (self.maze.width < 12 or self.maze.height < 7):
+        Returns early if maze dimensions are too
+        small to fit the pattern.
+        """
+        if self.maze.width < 12 or self.maze.height < 7:
             return
 
         cx = (self.maze.width // 2) - 4
@@ -211,6 +248,17 @@ class MazeGenerator:
 
     @staticmethod
     def save_maze(maze: Maze, config: Parser, solution: str) -> None:
+        """
+        Export maze structure to output file.
+
+        Writes hexadecimal wall encoding, entry,
+        exit and shortest solution path.
+
+        Args:
+            maze: Maze structure.
+            config: Maze configuration.
+            solution: NESW shortest path string.
+        """
         assert config.output_file is not None
         assert config.entry is not None
         assert config.exit is not None
@@ -220,7 +268,6 @@ class MazeGenerator:
                 for row in maze.grid:
                     line = "".join(maze.cell_to_hex(c) for c in row)
                     file.write(line + "\n")
-                    # print("".join(maze.cell_to_hex(c) for c in row))
 
                 file.write("\n")
                 file.write(f"{str(config.entry[0])},{str(config.entry[1])}")

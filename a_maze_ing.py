@@ -25,7 +25,13 @@ from solver import MazeSolver
 
 
 def main() -> None:
+    """
+    Run the maze generation program.
 
+    Parses the configuration file, generates
+    the maze, solves the shortest path and
+    launches the interactive terminal menu.
+    """
     if len(sys.argv) != 2:
         print("Usage: python3 a_maze_ing.py config.txt")
         sys.exit(1)

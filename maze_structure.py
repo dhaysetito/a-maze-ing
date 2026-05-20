@@ -17,7 +17,15 @@ from parser import Parser
 
 
 class Cell:
+    """Maze cell structure."""
+
     def __init__(self) -> None:
+        """
+        Initialize closed maze cell.
+
+        Creates a cell with all walls closed and
+        default traversal state disabled.
+        """
         self.north = True
         self.east = True
         self.south = True
@@ -26,8 +34,15 @@ class Cell:
         self.blocked = False
 
     def has_wall(self, direction: str) -> bool:
-        """Return whether a wall exists in the given direction."""
+        """
+        Check if a wall exists in given direction.
 
+        Args:
+            direction: Cardinal wall direction.
+
+        Returns:
+            True if wall exists.
+        """
         mapping = {
             "N": self.north,
             "E": self.east,
@@ -44,7 +59,6 @@ class Cell:
 
     def close_all_walls(self) -> None:
         """Close all cell walls."""
-
         self.north = True
         self.east = True
         self.south = True
@@ -52,7 +66,15 @@ class Cell:
 
 
 class Maze:
+    """Maze grid representation."""
+
     def __init__(self, config: Parser) -> None:
+        """
+        Initialize maze grid structure.
+
+        Args:
+            config: Maze configuration parser.
+        """
         assert config.width is not None
         assert config.height is not None
 
@@ -65,12 +87,27 @@ class Maze:
         ]
 
     def get_cell(self, x: int, y: int) -> Cell:
+        """Return cell at given coordinates."""
         return self.grid[y][x]
 
     def in_bounds(self, x: int, y: int) -> bool:
+        """Check if coordinates are inside maze bounds."""
         return 0 <= x < self.width and 0 <= y < self.height
 
     def neighbors(self, x: int, y: int) -> list[tuple[str, int, int]]:
+        """
+        Return valid neighboring cells.
+
+        Filters adjacent coordinates that remain
+        inside maze boundaries.
+
+        Args:
+            x: Current cell x coordinate.
+            y: Current cell y coordinate.
+
+        Returns:
+            List of valid neighboring coordinates.
+        """
         directions = [
             ("N", x, y - 1),
             ("E", x + 1, y),
@@ -84,8 +121,23 @@ class Maze:
             if self.in_bounds(nx, ny)
         ]
 
-    def reachable_neighbors(self, x: int, y: int
+    def reachable_neighbors(self,
+                            x: int,
+                            y: int
                             ) -> list[tuple[int, int]]:
+        """
+        Return reachable neighboring cells.
+
+        Filters adjacent cells without blocking
+        walls from the current position.
+
+        Args:
+            x: Current cell x coordinate.
+            y: Current cell y coordinate.
+
+        Returns:
+            List of reachable neighbor coordinates.
+        """
         neighbors = []
 
         cell = self.get_cell(x, y)
@@ -103,8 +155,18 @@ class Maze:
         x2: int,
         y2: int,
     ) -> None:
-        """Remove walls between orthogonal neighboring cells."""
+        """
+        Remove walls between adjacent cells.
 
+        Updates both cells to preserve wall
+        consistency across the maze.
+
+        Args:
+            x1: First cell x coordinate.
+            y1: First cell y coordinate.
+            x2: Second cell x coordinate.
+            y2: Second cell y coordinate.
+        """
         c1 = self.get_cell(x1, y1)
         c2 = self.get_cell(x2, y2)
 
@@ -135,8 +197,15 @@ class Maze:
             )
 
     def cell_to_hex(self, cell: Cell) -> str:
-        """Convert a cell wall structure into hexadecimal encoding."""
+        """
+        Convert cell walls into hexadecimal encoding.
 
+        Args:
+            cell: Maze cell structure.
+
+        Returns:
+            Hexadecimal wall representation.
+        """
         value = 0
 
         if cell.north:
@@ -154,8 +223,12 @@ class Maze:
         return format(value, "X")
 
     def to_hex_grid(self) -> list[list[str]]:
-        """Return the maze encoded as hexadecimal."""
+        """
+        Return hexadecimal maze representation.
 
+        Returns:
+            Hexadecimal encoded maze grid.
+        """
         return [
             [self.cell_to_hex(cell) for cell in row]
             for row in self.grid

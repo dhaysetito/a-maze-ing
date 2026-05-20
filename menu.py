@@ -26,6 +26,7 @@ from audio_manager import AudioManager
 
 
 class MazeMenu:
+    """Interactive maze terminal menu."""
 
     THEME_MUSIC: dict[str, str] = {
         "1": " ",
@@ -43,7 +44,14 @@ class MazeMenu:
         generator: MazeGenerator,
         config: Parser,
     ) -> None:
+        """
+        Initialize interactive maze menu.
 
+        Args:
+            maze: Maze structure.
+            generator: Maze generator instance.
+            config: Maze configuration parser.
+        """
         self.maze = maze
         self.generator = generator
         self.config = config
@@ -70,8 +78,12 @@ class MazeMenu:
         os.system("clear")
 
     def _render(self) -> None:
-        """Render maze using current state."""
+        """
+        Render maze using current state.
 
+        Updates renderer attributes before
+        displaying the maze.
+        """
         self.renderer.maze = self.maze
 
         if self.show_path:
@@ -84,8 +96,12 @@ class MazeMenu:
         self.renderer.render()
 
     def _show_menu(self) -> None:
-        """Display menu options."""
+        """
+        Display available menu options.
 
+        Shows interactive actions and current
+        visualization state.
+        """
         print()
 
         print(f"{'═'*15} Menu {'═'*15}")
@@ -107,8 +123,12 @@ class MazeMenu:
         print()
 
     def _show_title(self) -> None:
-        """Show maze title and pattern status."""
+        """
+        Show project title and maze status.
 
+        Displays ASCII banner and warns when
+        the 42 pattern is unavailable.
+        """
         print(
             "\033[1m"
             "\033[38;5;220m"
@@ -127,8 +147,12 @@ class MazeMenu:
             print("42 pattern was not generated.\n")
 
     def _regenerate(self) -> None:
-        """Generate a new maze."""
+        """
+        Generate and solve a new maze.
 
+        Resets current visualization state and
+        updates the stored solution path.
+        """
         self.maze = Maze(self.config)
         self.generator = MazeGenerator(self.maze, self.config)
         self.generator.generate()
@@ -141,8 +165,12 @@ class MazeMenu:
         self.show_path = not self.show_path
 
     def _change_theme(self) -> None:
-        """Change renderer theme."""
+        """
+        Change active renderer theme.
 
+        Updates maze colors and associated
+        background music.
+        """
         print(f"\n{'═'*9} Choose a Theme: {'═'*10}")
         for key, (name, _) in themes.THEMES.items():
             print(f"[{key}] {name}")
@@ -164,7 +192,12 @@ class MazeMenu:
             self._pause()
 
     def _save_maze(self) -> None:
-        """Save maze to output file."""
+        """
+        Save maze to output file.
+
+        Exports hexadecimal maze encoding and
+        shortest solution path.
+        """
         try:
             new_file = input(
                 f"Enter the name of the file to save"
@@ -184,8 +217,7 @@ class MazeMenu:
             self._pause()
 
     def _show_stats(self) -> None:
-        """Display maze statistics."""
-
+        """Display maze generation statistics."""
         solver = MazeSolver(self.maze, self.config)
         path = solver.solve()
 
@@ -204,8 +236,15 @@ class MazeMenu:
         print(f"\n{'═'*36}")
 
     def _handle_choice(self, choice: str) -> bool:
-        """Handle user menu selection."""
+        """
+        Handle user menu selection.
 
+        Args:
+            choice: Selected menu option.
+
+        Returns:
+            False when exiting the menu.
+        """
         if choice == "1":
             self._regenerate()
 
@@ -227,7 +266,7 @@ class MazeMenu:
 
         elif choice == "0":
             self.audio.stop()
-            print("\nQue a força esteja sempre com você!\n")
+            print("\nMeu tesouro? Se quiserem, podem pegá-lo! Procurem-no!")
             return False
 
         else:
@@ -237,13 +276,16 @@ class MazeMenu:
         return True
 
     def _pause(self) -> None:
-        """Wait for user before continuing."""
-
+        """Wait for user confirmation."""
         input("Press ENTER to continue...")
 
     def _animate_solution(self) -> None:
-        """Animate maze solution."""
+        """
+        Animate shortest maze solution.
 
+        Displays the solution path incrementally
+        using the active renderer theme.
+        """
         solver = MazeSolver(self.maze, self.config)
         path = solver.solve()
 
@@ -262,8 +304,12 @@ class MazeMenu:
         self.show_path = True
 
     def run(self) -> None:
-        """Start interactive menu loop."""
+        """
+        Start interactive terminal loop.
 
+        Continuously renders the maze and
+        handles user interactions.
+        """
         while True:
             try:
                 self._clear_screen()
@@ -276,5 +322,6 @@ class MazeMenu:
                     break
             except KeyboardInterrupt:
                 self.audio.stop()
-                print("\nQue a força esteja sempre com você!")
+                print("\nMeu tesouro? "
+                      "Se quiserem, podem pegá-lo! Procurem-no!")
                 break

@@ -14,7 +14,6 @@
 #
 # ****************************************************************************
 
-from __future__ import annotations
 from collections import deque
 import time
 
@@ -23,7 +22,16 @@ from parser import Parser
 
 
 class MazeSolver:
+    """Breadth-First Search maze solver."""
+
     def __init__(self, maze: Maze, config: Parser) -> None:
+        """
+        Initialize maze solver.
+
+        Args:
+            maze: Maze structure.
+            config: Maze configuration parser.
+        """
         assert config.entry is not None
         assert config.exit is not None
 
@@ -32,8 +40,7 @@ class MazeSolver:
         self.exit = config.exit
 
         self.path: (
-            list[tuple[int, int]]
-            | None
+            list[tuple[int, int]] | None
         ) = None
 
     def _reconstruct_path(
@@ -43,8 +50,18 @@ class MazeSolver:
             tuple[int, int] | None,
         ],
     ) -> list[tuple[int, int]]:
-        """Reconstruct shortest path."""
+        """
+        Reconstruct shortest path.
 
+        Traverses parent relationships from
+        exit to entry coordinates.
+
+        Args:
+            parents: BFS parent mapping.
+
+        Returns:
+            Ordered shortest path coordinates.
+        """
         path = []
         current: tuple[int, int] | None = self.exit
 
@@ -60,8 +77,12 @@ class MazeSolver:
     def path_to_directions(
         self,
     ) -> str:
-        """Convert coordinate path to directions."""
+        """
+        Convert coordinate path into directions.
 
+        Returns:
+            NESW movement direction string.
+        """
         if self.path is None:
             return ""
 
@@ -87,8 +108,16 @@ class MazeSolver:
         return "".join(directions)
 
     def solve(self) -> list[tuple[int, int]]:
-        """Solve maze using BFS."""
+        """
+        Solve maze using Breadth-First Search.
 
+        Explores reachable cells level by
+        level to compute the shortest path
+        between entry and exit.
+
+        Returns:
+            Shortest valid maze path.
+        """
         self.visited_nodes = 0
         self.solve_time = 0.0
         queue = deque([self.entry])

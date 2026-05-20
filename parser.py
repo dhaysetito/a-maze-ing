@@ -1,6 +1,6 @@
 # ****************************************************************************
 #
-#    a_maze_ing.py
+#    parser.py
 #
 #    By: dhde-lim <dhde-lim@student.42.rio> and
 #        ganselmo <ganselmo@student.42.rio>
@@ -13,25 +13,38 @@
 #
 # ****************************************************************************
 
-# TODO adicionar docstrings
 from exceptions import ConfigError, MazeError
 
 
 class Parser:
-    def __init__(self, file_name: str = "config.txt"):
+    """Maze configuration parser."""
+    def __init__(self, file_name: str = "config.txt") -> None:
+        """
+        Initialize configuration parser.
+
+        Args:
+            file_name: Configuration file path.
+        """
         self.file_name = file_name
-        self.width: (int | None) = None
-        self.height: (int | None) = None
-        self.entry: (tuple[int, int] | None) = None
-        self.exit: (tuple[int, int] | None) = None
-        self.output_file: (str | None) = None
-        self.perfect: (bool | None) = None
-        self.seed: (int | None) = None
-        self.algorithm = "BFS"
+        self.width: int | None = None
+        self.height: int | None = None
+        self.entry: tuple[int, int] | None = None
+        self.exit: tuple[int, int] | None = None
+        self.output_file: str | None = None
+        self.perfect: bool | None = None
+        self.seed: int | None = None
+        self.algorithm: str = "BFS"
 
         self._read_file()
 
     def _read_file(self) -> None:
+        """
+        Read and validate configuration file.
+
+        Parses configuration entries line by
+        line while aggregating validation
+        errors.
+        """
         errors: list[ConfigError] = []
         try:
             with open(self.file_name, "r") as file:
@@ -56,6 +69,16 @@ class Parser:
             raise ConfigError.aggregate(errors)
 
     def _parse_line(self, line: str) -> None:
+        """
+        Parse configuration line.
+
+        Validates supported keys and converts
+        configuration values into typed
+        attributes.
+
+        Args:
+            line: Raw configuration line.
+        """
         key, _, value = line.partition("=")
         key = key.strip().upper()
         value = value.strip()
@@ -146,6 +169,12 @@ class Parser:
             raise ConfigError("[" + key + "]", "unknown parameter")
 
     def _validate_required_fields(self) -> None:
+        """
+        Validate mandatory configuration fields.
+
+        Raises exceptions when required
+        fields are missing.
+        """
         if self.width is None:
             raise ConfigError.missing_field("[WIDTH]")
 

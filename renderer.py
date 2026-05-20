@@ -13,14 +13,15 @@
 #
 # ****************************************************************************
 
-from __future__ import annotations
+import themes
 
 from maze_structure import Maze
 from parser import Parser
-import themes
 
 
 class MazeRenderer:
+    """ANSI terminal maze renderer."""
+
     DIRECTION_OFFSETS: dict[str, tuple[int, int]] = {
         "N": (0, -1),
         "S": (0, 1),
@@ -35,7 +36,15 @@ class MazeRenderer:
         path: list[tuple[int, int]] | None = None,
         theme: dict[str, str] | None = None,
     ) -> None:
+        """
+        Initialize maze renderer.
 
+        Args:
+            maze: Maze structure.
+            config: Maze configuration parser.
+            path: Optional solution path.
+            theme: Optional renderer theme.
+        """
         self.maze = maze
         self.config = config
         self.path = path
@@ -54,8 +63,12 @@ class MazeRenderer:
         self.canvas: list[list[str]] = []
 
     def _update_theme(self) -> None:
-        """Update renderer theme colors."""
+        """
+        Update renderer theme attributes.
 
+        Loads colors and blocks from the
+        active theme configuration.
+        """
         self.wall_block = self.theme["wall_block"]
         self.path_block = self.theme["path_block"]
         self.entry_block = self.theme["entry_block"]
@@ -73,8 +86,12 @@ class MazeRenderer:
         self.reset = self.theme["reset"]
 
     def _create_canvas(self) -> None:
-        """Create a fresh render canvas."""
+        """
+        Create fresh renderer canvas.
 
+        Initializes the terminal grid using
+        wall blocks and active theme colors.
+        """
         self.canvas = [
             [
                 (
@@ -88,13 +105,24 @@ class MazeRenderer:
         ]
 
     def _paint(self, x: int, y: int, color: str, block: str) -> None:
-        """Paint a single block."""
+        """
+        Paint a single canvas block.
 
+        Args:
+            x: Canvas x coordinate.
+            y: Canvas y coordinate.
+            color: ANSI color sequence.
+            block: Render block character.
+        """
         self.canvas[y][x] = f"{color}{block}{self.reset}"
 
     def _draw_cells(self) -> None:
-        """Draw maze cells."""
+        """
+        Draw maze cells and corridors.
 
+        Renders walkable areas and blocked
+        cells using the active visual theme.
+        """
         for y in range(self.maze.height):
 
             for x in range(self.maze.width):
@@ -138,8 +166,12 @@ class MazeRenderer:
                             )
 
     def _draw_path(self) -> None:
-        """Draw solution path."""
+        """
+        Draw shortest solution path.
 
+        Paints path cells and connectors
+        between adjacent solution positions.
+        """
         if not self.path:
             return
 
@@ -167,8 +199,12 @@ class MazeRenderer:
                     )
 
     def _draw_entry_exit(self) -> None:
-        """Draw entry and exit."""
+        """
+        Draw maze entry and exit points.
 
+        Highlights start and destination
+        cells using dedicated theme blocks.
+        """
         assert self.config.entry is not None
         assert self.config.exit is not None
         entry_x, entry_y = self.config.entry
@@ -189,8 +225,12 @@ class MazeRenderer:
         )
 
     def render(self) -> None:
-        """Render complete maze."""
+        """
+        Render complete maze visualization.
 
+        Updates the canvas and prints the
+        final ANSI-rendered maze.
+        """
         self._update_theme()
         self._create_canvas()
         self._draw_cells()
