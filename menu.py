@@ -101,6 +101,7 @@ class MazeMenu:
         else:
             print("[4] Save maze (not saved)")
         print("[5] Animate solution")
+        print("[6] Show stats")
         print("[0] Exit")
         print(f"{'═'*36}")
 
@@ -108,9 +109,7 @@ class MazeMenu:
 
     def _show_title(self) -> None:
         """Show maze title and pattern status."""
-        # print(f"\n\033[1m\033[38;5;220m"
-        #       f"{'═'*20} A-Maze-ing {'═'*20}\n"
-        #       f"\033[0m\n")
+
         print(
             "\033[1m"
             "\033[38;5;220m"
@@ -185,6 +184,26 @@ class MazeMenu:
             self.save = False
             self._pause()
 
+    def _show_stats(self) -> None:
+        """Display maze statistics."""
+
+        solver = MazeSolver(self.maze, self.config)
+        path = solver.solve()
+
+        print(f"\n{'═'*15} Stats {'═'*14}\n")
+
+        print(f"Algorithm: {self.config.algorithm}")
+        print(f"Maze Size: {self.maze.width} x {self.maze.height}")
+        print(f"Perfect Maze: {self.config.perfect}")
+        print(f"Visited Nodes: {solver.visited_nodes}")
+        print(f"Path Length: {len(path)}")
+        print(f"Solve Time: {solver.solve_time:.6f}s")
+        print(f"Generation Time: {self.generator.generation_time:.6f}s")
+        print(f"Loops Added: {self.generator.loops_added}")
+        print(f"42 Pattern: {self.generator.has_42_pattern}")
+        print(f"Seed: {self.config.seed}")
+        print(f"\n{'═'*36}")
+
     def _handle_choice(self, choice: str) -> bool:
         """Handle user menu selection."""
 
@@ -203,13 +222,17 @@ class MazeMenu:
         elif choice == "5":
             self._animate_solution()
 
+        elif choice == "6":
+            self._show_stats()
+            self._pause()
+
         elif choice == "0":
             self.audio.stop()
             print("\nQue a força esteja sempre com você!\n")
             return False
 
         else:
-            print("\nSelect a valid menu option (0-5).\n")
+            print("\nSelect a valid menu option (0-6).\n")
             self._pause()
 
         return True

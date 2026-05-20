@@ -12,6 +12,7 @@
 
 from __future__ import annotations
 from collections import deque
+import time
 
 from maze_structure import Maze
 from parser import Parser
@@ -84,17 +85,21 @@ class MazeSolver:
     def solve(self) -> list[tuple[int, int]]:
         """Solve maze using BFS."""
 
+        self.visited_nodes = 0
+        self.solve_time = 0.0
         queue = deque([self.entry])
         visited = {self.entry}
         parents: dict[tuple[int, int], tuple[int, int] | None] = {
             self.entry: None
         }
-
+        start = time.perf_counter()
         while queue:
             current = queue.popleft()
+            self.visited_nodes += 1
 
             if current == self.exit:
                 self.path = self._reconstruct_path(parents)
+                self.solve_time = time.perf_counter() - start
                 return self.path
 
             x, y = current
@@ -107,5 +112,5 @@ class MazeSolver:
                     parents[neighbor] = current
                     queue.append(neighbor)
         self.path = []
-
+        self.solve_time = time.perf_counter() - start
         return self.path

@@ -132,18 +132,14 @@ class Parser:
                 raise ConfigError(f"[{key}]", "must be True or False")
 
         elif key == "SEED":
-            try:
-                self.seed = int(value)
-            except ValueError as e:
-                raise ConfigError.invalid_int(f"[{key}]") from e
+            if value == "None":
+                pass
+            else:
+                try:
+                    self.seed = int(value)
+                except ValueError as e:
+                    raise ConfigError.invalid_int(f"[{key}]") from e
 
-        elif key == "ALGORITHM":
-            # TODO tratar algoritmo inválido
-            if not value:
-                pass
-            valid_algorithms = {"BFS", "A*"}
-            if value.upper() not in valid_algorithms:
-                pass
         else:
             raise ConfigError("[" + key + "]", "unknown parameter")
 

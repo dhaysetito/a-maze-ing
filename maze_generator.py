@@ -10,6 +10,8 @@
 # ****************************************************************************
 
 import random
+import time
+
 from maze_structure import Maze
 from exceptions import MazeError
 from parser import Parser
@@ -21,6 +23,8 @@ class MazeGenerator:
         self.config = config
         self.random = random.Random(config.seed)
         self.has_42_pattern = False
+        self.generation_time = 0.0
+        self.loops_added = 0
 
     def _unvisited_neighbors(self, x: int, y: int) -> list[tuple[int, int]]:
         result: list[tuple[int, int]] = []
@@ -44,8 +48,6 @@ class MazeGenerator:
                 cell.blocked = False
 
     def _validate_entry_exit(self) -> None:
-        # TODO: modificar logica se quiser funcionar para qualquer
-        # entrada e saida
         assert self.config.entry is not None
         assert self.config.exit is not None
         entry = self.config.entry
@@ -60,8 +62,9 @@ class MazeGenerator:
         self.entry = entry
         self.exit = exit
 
-    # Algorithm DFS - deep first search
+    # Algorithm DFS - depth first search
     def generate(self) -> None:
+        start = time.perf_counter()
         stack: list[tuple[int, int]] = []
 
         try:
@@ -97,112 +100,67 @@ class MazeGenerator:
         if not self.config.perfect:
             self._add_loops()
 
+        self.generation_time = time.perf_counter() - start
         self._reset_visited()
 
     def _add_loops(self) -> None:
         """Create extra maze loops safely."""
 
-        loops = (
-            self.maze.width *
-            self.maze.height
-        ) // 20
+        loops = (self.maze.width * self.maze.height) // 20
 
         created = 0
         attempts = 0
         max_attempts = loops * 20
 
-        while (
-            created < loops and
-            attempts < max_attempts
-        ):
+        while (created < loops and attempts < max_attempts):
             attempts += 1
-
-            x = self.random.randint(
-                0,
-                self.maze.width - 1,
-            )
-
-            y = self.random.randint(
-                0,
-                self.maze.height - 1,
-            )
-
+            x = self.random.randint(0, self.maze.width - 1)
+            y = self.random.randint(0, self.maze.height - 1)
             cell = self.maze.get_cell(x, y)
-
             valid_neighbors = []
 
             for _, nx, ny in self.maze.neighbors(x, y):
-
-                neighbor = self.maze.get_cell(
-                    nx,
-                    ny,
-                )
-
-                if (
-                    cell.blocked or
-                    neighbor.blocked
-                ):
+                neighbor = self.maze.get_cell(nx, ny)
+                if (cell.blocked or neighbor.blocked):
                     continue
 
                 if nx == x + 1 and cell.east:
                     pass
-
                 elif nx == x - 1 and cell.west:
                     pass
-
                 elif ny == y + 1 and cell.south:
                     pass
-
                 elif ny == y - 1 and cell.north:
                     pass
-
                 else:
                     continue
 
                 open_paths = 0
-
                 for d, _, _ in self.maze.neighbors(x, y):
-
                     if not cell.has_wall(d):
                         open_paths += 1
 
                 if open_paths >= 3:
                     continue
-
                 open_neighbor_paths = 0
 
-                for d, _, _ in (
-                    self.maze.neighbors(
-                        nx,
-                        ny,
-                    )
-                ):
-
+                for d, _, _ in (self.maze.neighbors(nx, ny)):
                     if not neighbor.has_wall(d):
                         open_neighbor_paths += 1
 
                 if open_neighbor_paths >= 3:
                     continue
 
-                valid_neighbors.append(
-                    (nx, ny)
-                )
+                valid_neighbors.append((nx, ny))
 
             if not valid_neighbors:
                 continue
 
-            nx, ny = self.random.choice(
-                valid_neighbors
-            )
-
-            self.maze.remove_wall(
-                x,
-                y,
-                nx,
-                ny,
-            )
+            nx, ny = self.random.choice(valid_neighbors)
+            self.maze.remove_wall(x, y, nx, ny)
 
             created += 1
+            self.loops_added += 1
 
     def _create_42_pattern(self) -> None:
         """Create isolated 42 pattern."""
