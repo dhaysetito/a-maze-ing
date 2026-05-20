@@ -94,7 +94,115 @@ class MazeGenerator:
             else:
                 break
 
+        if not self.config.perfect:
+            self._add_loops()
+
         self._reset_visited()
+
+    def _add_loops(self) -> None:
+        """Create extra maze loops safely."""
+
+        loops = (
+            self.maze.width *
+            self.maze.height
+        ) // 20
+
+        created = 0
+        attempts = 0
+        max_attempts = loops * 20
+
+        while (
+            created < loops and
+            attempts < max_attempts
+        ):
+            attempts += 1
+
+            x = self.random.randint(
+                0,
+                self.maze.width - 1,
+            )
+
+            y = self.random.randint(
+                0,
+                self.maze.height - 1,
+            )
+
+            cell = self.maze.get_cell(x, y)
+
+            valid_neighbors = []
+
+            for _, nx, ny in self.maze.neighbors(x, y):
+
+                neighbor = self.maze.get_cell(
+                    nx,
+                    ny,
+                )
+
+                if (
+                    cell.blocked or
+                    neighbor.blocked
+                ):
+                    continue
+
+                if nx == x + 1 and cell.east:
+                    pass
+
+                elif nx == x - 1 and cell.west:
+                    pass
+
+                elif ny == y + 1 and cell.south:
+                    pass
+
+                elif ny == y - 1 and cell.north:
+                    pass
+
+                else:
+                    continue
+
+                open_paths = 0
+
+                for d, _, _ in self.maze.neighbors(x, y):
+
+                    if not cell.has_wall(d):
+                        open_paths += 1
+
+                if open_paths >= 3:
+                    continue
+
+                open_neighbor_paths = 0
+
+                for d, _, _ in (
+                    self.maze.neighbors(
+                        nx,
+                        ny,
+                    )
+                ):
+
+                    if not neighbor.has_wall(d):
+                        open_neighbor_paths += 1
+
+                if open_neighbor_paths >= 3:
+                    continue
+
+                valid_neighbors.append(
+                    (nx, ny)
+                )
+
+            if not valid_neighbors:
+                continue
+
+            nx, ny = self.random.choice(
+                valid_neighbors
+            )
+
+            self.maze.remove_wall(
+                x,
+                y,
+                nx,
+                ny,
+            )
+
+            created += 1
 
     def _create_42_pattern(self) -> None:
         """Create isolated 42 pattern."""

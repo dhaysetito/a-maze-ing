@@ -28,16 +28,6 @@ from audio_manager import AudioManager
 
 class MazeMenu:
 
-    THEMES: dict[str, dict[str, str]] = {
-        "1": themes.DEFAULT_THEME,
-        "2": themes.NORD_THEME,
-        "3": themes.DRACULA_THEME,
-        "4": themes.LUFFY_THEME,
-        "5": themes.ZORO_THEME,
-        "6": themes.BROOK_THEME,
-        "7": themes.GAME_THEME
-    }
-
     THEME_MUSIC: dict[str, str] = {
         "1": " ",
         "2": " ",
