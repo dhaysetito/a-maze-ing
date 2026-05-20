@@ -64,9 +64,9 @@ DRACULA_THEME: dict[str, str] = {
     "bg": "\x1b[48;5;236m",
     "wall_block": "██",
     "path_block": "  ",
-    "entry_block": "██",
-    "exit_block": "██",
-    "solve_block": "··",
+    "entry_block": "🚬",
+    "exit_block": "❤️ ",
+    "solve_block": "💃 ",
     "reset": "\x1b[0m",
     "blocked_block": "▒▒",
     "blocked": "\x1b[38;5;226m",
@@ -74,20 +74,24 @@ DRACULA_THEME: dict[str, str] = {
 
 LUFFY_THEME: dict[str, str] = {
     "path": (
-        "\x1b[48;5;234m"
+        "\x1b[48;5;160m"
     ),
-    "entry": "\x1b[38;5;196m",
-    "exit": "\x1b[38;5;27m",
+    "entry": (
+        "\x1b[48;5;160m"
+    ),
+    "exit": (
+        "\x1b[48;5;160m"
+    ),
     "wall": "\x1b[38;5;221m",
-    "bg": "\x1b[48;5;234m",
+    "bg": "\x1b[48;5;160m",
     "wall_block": "🟨",
     "path_block": "  ",
     "entry_block": "👒",
     "exit_block": "🏝️ ",
     "solve_block": "🍖",
     "reset": "\x1b[0m",
-    "blocked": "\x1b[38;5;226m",
-    "blocked_block": "💀",
+    "blocked": "\x1b[48;5;221m",
+    "blocked_block": "🥁",
 }
 
 ZORO_THEME: dict[str, str] = {

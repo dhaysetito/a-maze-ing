@@ -5,12 +5,12 @@
 #    By: dhde-lim <dhde-lim@student.42.rio> and
 #        ganselmo <ganselmo@student.42.rio>
 #
-#    Description: Background music manager.
+#    Description: Background audio manager responsible for
+#             controlling themed music playback in loop mode.
 #    Created: 2026/05/19
 #
 # ****************************************************************************
 
-from __future__ import annotations
 import os
 
 

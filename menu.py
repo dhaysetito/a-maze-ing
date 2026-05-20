@@ -12,8 +12,6 @@
 #
 # ****************************************************************************
 
-from __future__ import annotations
-
 import os
 import time
 
@@ -33,7 +31,7 @@ class MazeMenu:
         "1": " ",
         "2": " ",
         "3": " ",
-        "4": "songs/we_are.mp3",
+        "4": "songs/one_piece_overtaken.mp3",
         "5": "songs/wano_kuni.mp3",
         "6": "songs/binks_sake.mp3",
         "7": "songs/terror.mp3",

@@ -15,11 +15,12 @@
 # ****************************************************************************
 
 import sys
+
+from exceptions import ConfigError, MazeError
 from maze_generator import MazeGenerator
 from maze_structure import Maze
-from parser import Parser
-from exceptions import MazeError, ConfigError
 from menu import MazeMenu
+from parser import Parser
 from solver import MazeSolver
 
 

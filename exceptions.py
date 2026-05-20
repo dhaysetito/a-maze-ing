@@ -40,7 +40,7 @@ class ConfigError(MazeError):
     def invalid_bound(field: str) -> "ConfigError":
         return ConfigError(
             field,
-            "out of bounds: expected greater than 0"
+            "out of bounds: expected value between 1 and 50"
         )
 
     @staticmethod

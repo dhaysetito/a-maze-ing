@@ -57,6 +57,8 @@ class Parser:
 
     def _parse_line(self, line: str) -> None:
         key, _, value = line.partition("=")
+        key = key.strip().upper()
+        value = value.strip()
 
         if key == "WIDTH":
             try:
@@ -64,7 +66,7 @@ class Parser:
             except ValueError as e:
                 raise ConfigError.invalid_int(f"[{key}]") from e
 
-            if self.width <= 0:
+            if self.width <= 0 or self.width > 50:
                 raise ConfigError.invalid_bound(f"[{key}]")
 
         elif key == "HEIGHT":
@@ -73,7 +75,7 @@ class Parser:
             except ValueError as e:
                 raise ConfigError.invalid_int("[HEIGHT]") from e
 
-            if self.height <= 0:
+            if self.height <= 0 or self.height > 50:
                 raise ConfigError.invalid_bound("[HEIGHT]")
 
         elif key == "ENTRY":

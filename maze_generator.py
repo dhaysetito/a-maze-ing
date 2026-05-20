@@ -13,8 +13,8 @@
 #
 # ****************************************************************************
 
-import random
 import time
+import random
 
 from maze_structure import Maze
 from exceptions import MazeError
