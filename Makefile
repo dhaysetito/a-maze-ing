@@ -16,6 +16,7 @@ MAIN   = a_maze_ing.py
 install:
 	$(PYTHON) -m pip install --upgrade pip
 	$(PYTHON) -m pip install flake8 mypy
+	$(PYTHON) -m pip install mpg123
 
 # ******************************** RUN ***************************************
 run:
