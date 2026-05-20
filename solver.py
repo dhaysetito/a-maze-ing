@@ -5,7 +5,11 @@
 #    By: dhde-lim <dhde-lim@student.42.rio> and
 #        ganselmo <ganselmo@student.42.rio>
 #
-#    Description: Breadth-First Search maze solver.
+#    Description: Breadth-First Search shortest-path solver responsible
+#                 for traversing reachable maze cells, reconstructing the
+#                 optimal path, exporting movement directions and gathering
+#                 solving performance statistics.
+#
 #    Created: 2026/05/19
 #
 # ****************************************************************************

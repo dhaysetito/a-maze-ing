@@ -8,6 +8,7 @@
 #    Description: Defines the internal representation of the maze, including
 #                 cell structure, wall encoding, and grid organization used
 #                 during generation, solving, and export.
+#
 #    Created: 2026/04/28
 #
 # ****************************************************************************

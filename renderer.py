@@ -8,6 +8,7 @@
 #    Description: Terminal maze renderer responsible for drawing walls,
 #                 paths, entry and exit points using ANSI color themes
 #                 and block-based visualization.
+#
 #    Created: 2026/05/19
 #
 # ****************************************************************************

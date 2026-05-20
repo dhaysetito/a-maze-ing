@@ -5,6 +5,10 @@
 #    By: dhde-lim <dhde-lim@student.42.rio> and
 #        ganselmo <ganselmo@student.42.rio>
 #
+#    Description: Procedural maze generator based on Depth-First Search
+#                 backtracking, supporting perfect and non-perfect mazes,
+#                 isolated 42 patterns, seeded randomness and maze export.
+#
 #    Created: 2026/04/28
 #
 # ****************************************************************************

@@ -7,6 +7,7 @@
 #
 #    Description: Interactive terminal menu for maze visualization and
 #                 user interactions.
+#
 #    Created: 2026/05/19
 #
 # ****************************************************************************

@@ -8,6 +8,7 @@
 #    Description: Terminal color themes used for maze rendering,
 #                 including path, walls, entry, exit and background
 #                 customization.
+#
 #    Created: 2026/05/19
 #
 # ****************************************************************************

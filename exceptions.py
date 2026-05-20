@@ -5,6 +5,10 @@
 #    By: dhde-lim <dhde-lim@student.42.rio> and
 #        ganselmo <ganselmo@student.42.rio>
 #
+#    Description: Custom exception hierarchy used for maze generation,
+#                 parsing validation, configuration handling and runtime
+#                 error management across the A-Maze-ing project.
+#
 #    Created: 2026/04/22
 #
 # ****************************************************************************
